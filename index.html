@@ -3,29 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PureTouch CRM</title>
+<title>PURE TOUCH CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0d0f1a;
-  --bg2:#141726;
-  --bg3:#1b1f33;
-  --border:#262b42;
-  --accent:#6c63ff;
-  --accent2:#8a83ff;
-  --green:#22c55e;
-  --red:#ef4444;
-  --yellow:#eab308;
-  --text:#e8e9f3;
-  --text-dim:#9497b0;
-  --text-dim2:#6b6e85;
+  --bg:#fdfaf5;
+  --bg2:#ffffff;
+  --bg3:#f3ece5;
+  --border:#e6dcd0;
+  --accent:#8a7361;
+  --accent2:#5d4c3a;
+  --green:#7a9a7e;
+  --red:#c17a6a;
+  --yellow:#c99a52;
+  --text:#3d332a;
+  --text-dim:#8a7d72;
+  --text-dim2:#b7aca0;
+  --brand-taupe:#d0c9c1;
   --radius:12px;
+  --shadow:0 2px 10px rgba(93,76,58,.08);
+  --font-display:'Cormorant Garamond', Georgia, serif;
+  --font-mono:'JetBrains Mono', 'SF Mono', monospace;
 }
 *{box-sizing:border-box;}
 html,body{
   margin:0;padding:0;
   background:var(--bg);
   color:var(--text);
-  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
   -webkit-font-smoothing:antialiased;
 }
 body{padding-bottom:70px;}
@@ -36,14 +43,14 @@ input,select,textarea{font-family:inherit;}
 /* ===== TOP BAR ===== */
 .topbar{
   position:sticky;top:0;z-index:40;
-  background:rgba(13,15,26,.92);
+  background:rgba(253,250,245,.9);box-shadow:var(--shadow);
   backdrop-filter:blur(10px);
   border-bottom:1px solid var(--border);
   padding:14px 20px;
   display:flex;align-items:center;gap:16px;flex-wrap:wrap;
 }
-.brand{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px;white-space:nowrap;}
-.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+.brand{font-family:var(--font-display);font-weight:600;font-size:20px;letter-spacing:2.5px;text-transform:uppercase;display:flex;align-items:center;gap:9px;white-space:nowrap;color:var(--accent2);}
+.brand .dot{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--accent2);background:transparent;flex-shrink:0;}
 .tabs{display:flex;gap:4px;flex:1;flex-wrap:wrap;}
 .tab{
   background:transparent;border:1px solid transparent;color:var(--text-dim);
@@ -84,12 +91,17 @@ input,select,textarea{font-family:inherit;}
 .filterbar{
   display:flex;gap:8px;flex-wrap:wrap;align-items:center;
   padding:10px 20px;border-bottom:1px solid var(--border);
-  background:rgba(20,23,38,.5);
+  background:rgba(243,236,229,.65);
 }
 .filterbar select{
   background:var(--bg3);border:1px solid var(--border);color:var(--text);
-  padding:7px 10px;border-radius:8px;font-size:12.5px;
+  padding:7px 30px 7px 10px;border-radius:8px;font-size:12.5px;
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a7361' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 9px center;background-size:12px;
+  transition:border-color .15s;
 }
+.filterbar select:focus{outline:none;border-color:var(--accent);}
 @media (max-width:700px){
   .filterbar{padding:8px 14px;}
 }
@@ -99,14 +111,14 @@ input,select,textarea{font-family:inherit;}
 
 /* ===== STATS BAR ===== */
 .statsbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
-.stat-chip{
+.stat-chip{box-shadow:var(--shadow);
   flex:1;min-width:110px;background:var(--bg2);border:1px solid var(--border);
   border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:.12s;
   user-select:none;
 }
 .stat-chip:hover{border-color:var(--accent2);}
 .stat-chip.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
-.stat-chip .num{font-size:24px;font-weight:800;}
+.stat-chip .num{font-size:24px;font-weight:800;font-family:var(--font-mono);}
 .stat-chip .lbl{font-size:12px;color:var(--text-dim);margin-top:2px;}
 .stat-chip.tot .num{color:var(--accent2);}
 .stat-chip.ot .num{color:var(--yellow);}
@@ -116,7 +128,7 @@ input,select,textarea{font-family:inherit;}
 .stat-chip.fu .num{color:#f472b6;}
 
 /* ===== TABLE ===== */
-.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
 table{width:100%;border-collapse:collapse;font-size:13.5px;}
 thead th{
   text-align:left;padding:11px 14px;background:var(--bg3);
@@ -143,7 +155,7 @@ tbody tr:last-child td{border-bottom:none;}
 .cards{display:flex;flex-direction:column;gap:10px;}
 .lead-card{
   background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px 16px;cursor:pointer;
+  padding:14px 16px;cursor:pointer;box-shadow:var(--shadow);
 }
 .lead-card .top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
 .lead-card .name{font-weight:700;font-size:15px;}
@@ -153,7 +165,7 @@ tbody tr:last-child td{border-bottom:none;}
 /* ===== BOTTOM NAV (mobile) ===== */
 .bottom-nav{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;
-  background:rgba(20,23,38,.97);backdrop-filter:blur(10px);
+  background:rgba(255,255,255,.97);backdrop-filter:blur(10px);box-shadow:0 -2px 10px rgba(93,76,58,.08);
   border-top:1px solid var(--border);
   padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
 }
@@ -175,10 +187,10 @@ tbody tr:last-child td{border-bottom:none;}
   position:fixed;top:0;right:0;bottom:0;width:420px;max-width:100%;
   background:var(--bg2);border-left:1px solid var(--border);z-index:61;
   transform:translateX(100%);transition:transform .22s ease;
-  overflow-y:auto;padding:20px;
+  overflow-y:auto;padding:20px;box-shadow:-8px 0 30px rgba(120,90,80,.12);
 }
 .panel.open{transform:translateX(0);}
-.panel h3{margin:0 0 2px;font-size:19px;}
+.panel h3{margin:0 0 2px;font-size:22px;font-family:var(--font-display);font-weight:700;color:var(--accent2);}
 .panel .sub{color:var(--text-dim);font-size:13px;margin-bottom:18px;}
 .panel-close{
   position:absolute;top:16px;right:16px;background:var(--bg3);border:1px solid var(--border);
@@ -199,38 +211,87 @@ tbody tr:last-child td{border-bottom:none;}
 }
 .panel-actions{display:flex;gap:8px;margin-top:18px;}
 
-/* ===== PANEL ICON TOOLBAR (accordion) ===== */
-.panel-toolbar{
-  display:flex;gap:6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-  padding:10px 0;margin:16px 0 4px;
+/* ===== Sjednocený vzhled formulářových polí v panelu ===== */
+.panel input[type="text"], .panel input[type="number"], .panel input[type="date"],
+.panel textarea, .panel select {
+  width:100%;
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+  color:var(--text);
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:10px 12px;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s, background .15s;
 }
-.pt-icon{
-  flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);
-  padding:9px 4px;border-radius:8px;font-size:16px;display:flex;flex-direction:column;
-  align-items:center;gap:3px;
+.panel input::placeholder, .panel textarea::placeholder{color:var(--text-dim2);}
+.panel input[type="text"]:focus, .panel input[type="number"]:focus, .panel input[type="date"]:focus,
+.panel textarea:focus, .panel select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(138,115,97,.16);
+  background:#fff;
 }
-.pt-icon .pt-lbl{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
-.pt-icon.active{background:var(--accent)22;border-color:var(--accent);color:var(--accent2);}
-.accordion-section{
-  background:var(--bg3);border-radius:9px;padding:12px 14px;margin-bottom:10px;
-  display:none;
+.panel select{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a7361' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:13px;
+  padding-right:34px;
+  cursor:pointer;
 }
-.accordion-section.open{display:block;}
-.acc-row{display:flex;gap:8px;}
-.acc-row select{flex:0 0 70px;}
+.panel textarea{resize:vertical;min-height:74px;line-height:1.5;}
+.panel input[type="date"]{cursor:pointer;}
+
+/* ===== PANEL v2 — podle produkčního V&R Ads designu ===== */
+.email-btns{display:flex;gap:8px;margin-bottom:16px;}
+.email-btns .btn{flex:1;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.info-box{background:var(--bg3);border-radius:9px;padding:10px 12px;}
+.info-box .ibl{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;font-weight:700;}
+.info-box .ibv{font-size:14px;font-weight:600;}
+.info-box .ibv.link{color:var(--accent2);}
+.kategorie-select{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 11px;}
+.kategorie-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.kategorie-select select{background:transparent;border:none;color:var(--text);font-size:13.5px;font-weight:700;flex:1;padding:0;}
+.kampan-box{background:var(--bg3);border-radius:9px;padding:12px 14px;margin-bottom:14px;}
+.kampan-box .kbl{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.kampan-box .kname{font-size:15px;font-weight:700;margin-bottom:6px;}
+.kampan-box .kad{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);margin-bottom:5px;}
+.platform-badge{font-size:10px;font-weight:800;padding:2px 6px;border-radius:5px;color:#fff;letter-spacing:.3px;}
+.kampan-box .kweb{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px;}
+.prodej-box{background:#16653414;border:1px solid #22c55e33;border-radius:9px;padding:12px 14px;margin-bottom:14px;}
+.prodej-box .pbl{font-size:12px;font-weight:700;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.field-full{margin-bottom:14px;}
+.field-full label{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+
+/* ===== TABULKA v2 — inline editovatelné bu\u0148ky ===== */
+.inline-select{
+  background:transparent;border:none;color:inherit;font-size:12.5px;font-weight:700;
+  cursor:pointer;padding:0;
+}
+.cell-kategorie{display:flex;align-items:center;gap:6px;}
+.cell-fáze .date-sub, .cell-kategorie .date-sub{display:block;font-size:10.5px;color:var(--text-dim2);margin-top:2px;font-weight:400;}
+.mini-tag{
+  display:inline-flex;align-items:center;gap:4px;background:var(--bg3);
+  padding:2px 7px;border-radius:6px;font-size:11px;font-weight:700;
+}
 
 /* ===== EMAIL TAB ===== */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;}
-.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
-.kpi-card .n{font-size:26px;font-weight:800;}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+.kpi-card .n{font-size:26px;font-weight:800;font-family:var(--font-mono);}
 .kpi-card .l{font-size:12px;color:var(--text-dim);margin-top:3px;}
 .funnel-bar{display:flex;height:34px;border-radius:9px;overflow:hidden;margin-bottom:20px;border:1px solid var(--border);}
 .funnel-seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;min-width:2%;}
 .cta-banner{
-  background:linear-gradient(135deg,var(--accent),#4d44d4);border-radius:var(--radius);
+  background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--radius);
   padding:16px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
 }
 .cta-banner .txt strong{font-size:15px;}
+.cta-banner .btn-primary{background:#fff;border-color:#fff;color:var(--accent2);font-weight:700;}
+.cta-banner .btn-primary:hover{background:var(--bg3);}
 .cta-banner .txt div{font-size:12.5px;opacity:.9;margin-top:3px;}
 .email-section{margin-bottom:22px;}
 .email-section h4{font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin:0 0 10px;}
@@ -271,8 +332,8 @@ tbody tr:last-child td{border-bottom:none;}
 
 /* ===== STATS TAB ===== */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:22px;}
-.big-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
-.big-stat .n{font-size:30px;font-weight:800;}
+.big-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.big-stat .n{font-size:30px;font-weight:800;font-family:var(--font-mono);}
 .big-stat .l{font-size:12.5px;color:var(--text-dim);margin-top:4px;}
 .phase-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
 .phase-row:last-child{border-bottom:none;}
@@ -310,7 +371,7 @@ tbody tr:last-child td{border-bottom:none;}
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="brand"><span class="dot"></span> PureTouch</div>
+  <div class="brand"><span class="dot"></span> PURE TOUCH</div>
   <div class="tabs">
     <button class="tab" data-tab="table" onclick="setTab('table')">📋 Tabulka</button>
     <button class="tab" data-tab="stats" onclick="setTab('stats')">📈 Statistiky</button>
@@ -365,6 +426,11 @@ tbody tr:last-child td{border-bottom:none;}
           <th>Služba</th>
           <th>Poznámka</th>
           <th data-sort="stav">Fáze <span class="sort-arrow">▲</span></th>
+          <th>€</th>
+          <th>Produkt</th>
+          <th>Follow-up</th>
+          <th>Poznámky</th>
+          <th>Kampaň</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -405,52 +471,88 @@ tbody tr:last-child td{border-bottom:none;}
     <button class="panel-close" onclick="closePanel()">✕</button>
     <h3 id="pName">—</h3>
     <div class="sub" id="pFirma">—</div>
-    <div class="panel-info" id="pInfo"></div>
 
-    <div class="field">
-      <label>Fáze</label>
-      <select id="pStage"></select>
+    <div class="email-btns">
+      <button class="btn" onclick="copyLeadEmail()">📧 Email</button>
+      <button class="btn" onclick="openMailClient()">✉️ Email</button>
     </div>
 
-    <!-- Ikonová lišta — accordion pro vedlejší pole -->
-    <div class="panel-toolbar">
-      <button class="pt-icon" id="pt-btn-prodej" onclick="toggleAcc('prodej')">💰<span class="pt-lbl">Prodej</span></button>
-      <button class="pt-icon" id="pt-btn-produkt" onclick="toggleAcc('produkt')">📦<span class="pt-lbl">Produkt</span></button>
-      <button class="pt-icon" id="pt-btn-followup" onclick="toggleAcc('followup')">📅<span class="pt-lbl">Follow-up</span></button>
-      <button class="pt-icon" id="pt-btn-notes" onclick="toggleAcc('notes')">📝<span class="pt-lbl">Poznámky</span></button>
-      <button class="pt-icon" id="pt-btn-kampan" onclick="toggleAcc('kampan')">📣<span class="pt-lbl">Kampaň</span></button>
-    </div>
-
-    <div class="accordion-section" id="acc-prodej">
-      <div class="acc-row">
-        <select id="pMena"><option value="Kč">Kč</option><option value="€">€</option></select>
-        <input type="number" id="pCastka" placeholder="Částka prodeje">
+    <div class="two-col">
+      <div>
+        <label style="display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Stav (kategorie)</label>
+        <div class="kategorie-select">
+          <span class="kategorie-dot" id="pKatDot"></span>
+          <select id="pKategorie" onchange="onKategorieChange()">
+            <option value="otevreno">Otevřeno</option>
+            <option value="uzavreno">Uzavřeno</option>
+            <option value="konec">Konec</option>
+            <option value="">Bez stavu</option>
+          </select>
+        </div>
       </div>
-      <div style="margin-top:8px;">
-        <input type="text" id="pProdejNote" placeholder="Poznámka k prodeji (fakturace, splatnost…)">
+      <div>
+        <label style="display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Fáze</label>
+        <select id="pStage" onchange="onStageChange()"></select>
       </div>
     </div>
 
-    <div class="accordion-section" id="acc-produkt">
-      <input type="text" id="pProdukt" placeholder="např. AI video balíček">
+    <div class="two-col">
+      <div class="info-box"><div class="ibl">Email</div><div class="ibv link" id="pInfoEmail">—</div></div>
+      <div class="info-box"><div class="ibl">Telefon</div><div class="ibv" id="pInfoTel">—</div></div>
     </div>
 
-    <div class="accordion-section" id="acc-followup">
+    <div class="info-box" style="margin-bottom:14px;">
+      <div class="ibl">Problém / zájem</div>
+      <div class="ibv" id="pInfoProblem">—</div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-box"><div class="ibl">Lokalita</div><div class="ibv" id="pInfoLokalita">—</div></div>
+      <div class="info-box"><div class="ibl">Datum přijetí</div><div class="ibv" id="pInfoDatum">—</div></div>
+    </div>
+
+    <div class="kampan-box">
+      <div class="kbl">📣 Kampaň</div>
+      <div class="kname" id="pKampanName">—</div>
+      <div class="kad" id="pKampanAd" style="display:none;">
+        <span class="platform-badge" id="pKampanPlatform">FB</span>
+        <span id="pKampanAdName"></span>
+      </div>
+      <div class="kweb" id="pKampanWeb" style="display:none;">🌐 <span id="pKampanWebText"></span></div>
+    </div>
+
+    <div class="prodej-box">
+      <div class="pbl">💰 Prodej</div>
+      <div class="two-col" style="margin-bottom:10px;">
+        <div>
+          <label style="display:block;font-size:10.5px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Částka (€)</label>
+          <input type="number" id="pCastka" placeholder="0">
+        </div>
+        <div>
+          <label style="display:block;font-size:10.5px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Produkt</label>
+          <input type="text" id="pProdukt" placeholder="např. Masáže">
+        </div>
+      </div>
+      <label style="display:block;font-size:10.5px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Poznámka k prodeji</label>
+      <input type="text" id="pProdejNote" placeholder="Datum podpisu, podmínky…">
+    </div>
+
+    <div class="field-full">
+      <label>📅 Follow-up datum</label>
       <input type="date" id="pFollowup">
     </div>
 
-    <div class="accordion-section" id="acc-notes">
+    <div class="field-full">
+      <label>📝 Moje poznámky</label>
       <textarea id="pNotes" placeholder="Poznámky, historie komunikace…"></textarea>
     </div>
 
-    <div class="accordion-section" id="acc-kampan">
+    <div class="field-full">
+      <label>📣 Kampaň (ruční přiřazení)</label>
       <input type="text" id="pKampan" placeholder="Název kampaně / kreativy">
     </div>
 
-    <div class="panel-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="savePanel()">💾 Uložit</button>
-      <button class="btn" onclick="closePanel()">Zavřít</button>
-    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="savePanel()">Zavřít a uložit</button>
   </div>
 </div>
 
@@ -468,26 +570,40 @@ const GSHEET_URL = 'https://docs.google.com/spreadsheets/d/1zGTYtVOjteFdunrItxKy
 
 // ---------- FAZE MODEL ----------
 const FAZE = [
-  {id:'',                 label:'—',                     poz:'',         cls:'b-none',  color:'#64748b'},
-  {id:'volat',             label:'Volat 📞',              poz:'otevreno', cls:'b-volat', color:'#eab308'},
-  {id:'nezvedan1',         label:'Nezvedá 1 ☎️',          poz:'otevreno', cls:'b-nez1',  color:'#f59e0b'},
-  {id:'nezvedan2',         label:'Nezvedá 2 ☎️',          poz:'otevreno', cls:'b-nez2',  color:'#f97316'},
-  {id:'nezvedan3',         label:'Nezvedá 3 ☎️',          poz:'otevreno', cls:'b-nez3',  color:'#ea580c'},
-  {id:'odeslat_email',     label:'Odeslat email 📧',      poz:'otevreno', cls:'b-oem',   color:'#38bdf8'},
-  {id:'email_odeslano',    label:'Email odeslán 📤',      poz:'otevreno', cls:'b-emo',   color:'#0ea5e9'},
-  {id:'email_odpoved',     label:'Email - odpověď 💬',    poz:'otevreno', cls:'b-emr',   color:'#6366f1'},
-  {id:'uzavreno_emailem',  label:'Uzavřeno emailem 💚',   poz:'uzavreno', cls:'b-uze',   color:'#22c55e'},
-  {id:'komunikace_wa',     label:'Komunikace na WA 💬',   poz:'otevreno', cls:'b-wa',    color:'#25d366'},
-  {id:'nerelevantni',      label:'Nerelevantní ☹️',       poz:'konec',    cls:'b-nrl',   color:'#6b7280'},
-  {id:'konec',             label:'Konec ❌',              poz:'konec',    cls:'b-end',   color:'#ef4444'},
-  {id:'domluvena_schuzka', label:'Domluvena schuzka ✅',  poz:'otevreno', cls:'b-sch',   color:'#a855f7'},
-  {id:'odeslana_faktura',  label:'Odeslana faktura 🧾',   poz:'otevreno', cls:'b-fak',   color:'#14b8a6'},
-  {id:'uzavreno',          label:'Uzavřeno 💚',           poz:'uzavreno', cls:'b-uz',    color:'#16a34a'},
+  {id:'',                    label:'—',                          poz:'',         cls:'b-none',  color:'#64748b'},
+  {id:'volat',                label:'Volat 📞',                   poz:'otevreno', cls:'b-volat', color:'#eab308'},
+  {id:'nezvedan1',            label:'Nezvedá 1 ☎️',               poz:'otevreno', cls:'b-nez1',  color:'#f59e0b'},
+  {id:'nezvedan2',            label:'Nezvedá 2 ☎️',               poz:'otevreno', cls:'b-nez2',  color:'#f97316'},
+  {id:'nezvedan3',            label:'Nezvedá 3 ☎️',               poz:'otevreno', cls:'b-nez3',  color:'#ea580c'},
+  {id:'komunikace_email',     label:'Komunikace email 📧',        poz:'otevreno', cls:'b-kem',   color:'#38bdf8'},
+  {id:'komunikace_sms',       label:'Komunikace SMS 💬',          poz:'otevreno', cls:'b-ksms',  color:'#22d3ee'},
+  {id:'email_odeslano',       label:'Email odeslán 📤',           poz:'otevreno', cls:'b-emo',   color:'#0ea5e9'},
+  {id:'domluvena_schuzka',    label:'Domluvena schuzka ✅',       poz:'otevreno', cls:'b-sch',   color:'#a855f7'},
+  {id:'zaplacena_zaloha',     label:'Zaplacena záloha 💶',        poz:'otevreno', cls:'b-zzal',  color:'#d4a24c'},
+  {id:'odeslana_zaloh_faktura', label:'Odeslana zaloh. faktura 🧾', poz:'otevreno', cls:'b-fak', color:'#14b8a6'},
+  {id:'poskytnuta_sluzba',    label:'Poskytnuta služba 💚',       poz:'uzavreno', cls:'b-uz',    color:'#16a34a'},
+  {id:'nerelevantni',         label:'Nerelevantní ☹️',            poz:'konec',    cls:'b-nrl',   color:'#6b7280'},
+  {id:'konec',                label:'Konec ❌',                   poz:'konec',    cls:'b-end',   color:'#ef4444'},
 ];
 const FAZE_MAP = {};
 FAZE.forEach(f => FAZE_MAP[f.id] = f);
 function getPoz(stav) { return (FAZE_MAP[stav] || FAZE[0]).poz; }
 function getFaze(stav) { return FAZE_MAP[stav] || FAZE[0]; }
+
+const POZ_COLOR = {otevreno:'#eab308', uzavreno:'#22c55e', konec:'#ef4444', '':'#64748b'};
+const POZ_LABEL = {otevreno:'otevřen', uzavreno:'uzavřer', konec:'konec', '':'bez stavu'};
+// reprezentativní fáze při rychlém přepnutí kategorie
+const POZ_DEFAULT_STAV = {otevreno:'volat', uzavreno:'poskytnuta_sluzba', konec:'konec', '':''};
+
+const PLATFORM_COLOR = {META:'#1877F2', FB:'#1877F2', FACEBOOK:'#1877F2', GOOGLE:'#EA4335', IG:'#E1306C', INSTAGRAM:'#E1306C', TIKTOK:'#000000'};
+function platformShort(p){
+  const u = (p||'').toUpperCase();
+  if (u.includes('FACEBOOK') || u==='META') return 'FB';
+  if (u.includes('INSTA')) return 'IG';
+  if (u.includes('GOOGLE')) return 'GOOGLE';
+  if (u.includes('TIKTOK')) return 'TT';
+  return p || 'FB';
+}
 
 // ---------- STATE ----------
 let leads = [];          // merged leads + crm_data
@@ -785,7 +901,6 @@ function renderTable(){
   const filtered = getFiltered();
   const tbody = document.getElementById('tableBody');
 
-  // aktualizuj vzhled hlavičky (aktivní řazení)
   document.querySelectorAll('#tableHeadRow th[data-sort]').forEach(th => {
     const f = th.dataset.sort;
     th.classList.toggle('sorted', f === sortField);
@@ -795,25 +910,69 @@ function renderTable(){
   });
 
   if (!filtered.length){
-    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state">Žádní leadi neodpovídají filtru.</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="15"><div class="empty-state">Žádní leadi neodpovídají filtru.</div></td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map(l => {
     const f = getFaze(l.stav);
-    const note = (l.myNotes||'').slice(0,40) + ((l.myNotes||'').length>40?'…':'');
-    return `<tr onclick="openLeadPanel('${escAttr(l.email)}')">
-      <td class="muted">${fmtDate(l.datum || l.created_at)}</td>
-      <td>${esc(l.jmeno)||'<span class="muted">–</span>'}</td>
-      <td>${esc(l.firma)||'<span class="muted">–</span>'}</td>
-      <td>${esc(l.telefon)||'<span class="muted">–</span>'}</td>
-      <td>${esc(l.email)}</td>
-      <td>${esc(l.problem)||'<span class="muted">–</span>'}</td>
-      <td>${esc(l.lokalita)||'<span class="muted">–</span>'}</td>
-      <td>${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
-      <td class="muted">${esc(note)||'–'}</td>
-      <td><span class="badge" style="background:${f.color}22;color:${f.color}">${f.label}</span></td>
+    const poz = getPoz(l.stav) || '';
+    const pozColor = POZ_COLOR[poz];
+    const note = (l.myNotes||'').slice(0,30) + ((l.myNotes||'').length>30?'…':'');
+    const castka = l.prodej_castka ? `<span style="color:var(--green);font-weight:700;">${Number(l.prodej_castka).toLocaleString('cs-CZ')} €</span>` : '<span class="muted">–</span>';
+    const plat = platformShort(l.platform);
+    const platColor = PLATFORM_COLOR[(l.platform||'FB').toUpperCase()] || '#1877F2';
+
+    return `<tr>
+      <td class="muted" onclick="openLeadPanel('${escAttr(l.email)}')">${fmtDate(l.datum || l.created_at)}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.jmeno)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.firma)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.telefon)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.email)}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.problem)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.lokalita)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
+      <td class="cell-kategorie">
+        <span class="kategorie-dot" style="background:${pozColor};display:inline-block;width:8px;height:8px;border-radius:50%;"></span>
+        <select class="inline-select" style="color:${pozColor}" onclick="event.stopPropagation()" onchange="inlineSetKategorie('${escAttr(l.email)}', this.value)">
+          <option value="otevreno" ${poz==='otevreno'?'selected':''}>otevřen</option>
+          <option value="uzavreno" ${poz==='uzavreno'?'selected':''}>uzavřer</option>
+          <option value="konec" ${poz==='konec'?'selected':''}>konec</option>
+          <option value="" ${poz===''?'selected':''}>bez stavu</option>
+        </select>
+      </td>
+      <td class="cell-fáze">
+        <select class="inline-select" style="color:${f.color}" onclick="event.stopPropagation()" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
+          ${buildStageOptions(l.stav)}
+        </select>
+        <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
+      </td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${castka}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.prodej_produkt)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')" class="muted">${l.followup ? fmtDate(l.followup) : '–'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')" class="muted">${esc(note)||'–'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${l.campaign_name ? `<span class="mini-tag"><span class="platform-badge" style="background:${platColor};padding:1px 4px;font-size:9px;">${plat}</span> ${esc(l.campaign_name)}</span>` : '<span class="muted">–</span>'}</td>
     </tr>`;
   }).join('');
+}
+
+// Inline úpravy přímo v tabulce (bez otevření panelu)
+async function inlineSetKategorie(email, poz){
+  const lead = leads.find(l => l.email === email);
+  if (!lead) return;
+  const oldStav = lead.stav;
+  lead.stav = POZ_DEFAULT_STAV[poz];
+  lead.poz = getPoz(lead.stav);
+  await saveToApi(lead, oldStav);
+  renderStatsBar(); renderTable();
+}
+async function inlineSetStav(email, stav){
+  const lead = leads.find(l => l.email === email);
+  if (!lead) return;
+  const oldStav = lead.stav;
+  lead.stav = stav;
+  lead.poz = getPoz(stav);
+  await saveToApi(lead, oldStav);
+  renderStatsBar(); renderTable();
 }
 
 // ============================================================
@@ -870,48 +1029,65 @@ function openLeadPanel(email){
   currentLead = lead;
   document.getElementById('pName').textContent = lead.jmeno || lead.email;
   document.getElementById('pFirma').textContent = lead.firma || '—';
-  document.getElementById('pInfo').innerHTML = `
-    ✉️ ${esc(lead.email)}<br>
-    📞 ${esc(lead.telefon)||'neuvedeno'}<br>
-    🎯 Zdroj: ${esc(lead.zdroj)||'neuvedeno'} · Služba: ${esc(lead.sluzba)||'neuvedeno'}<br>
-    📍 Lokalita: ${esc(lead.lokalita)||'neuvedeno'}<br>
-    📅 Vytvořeno: ${fmtDate(lead.datum || lead.created_at)}
-  `;
+
+  document.getElementById('pInfoEmail').textContent = lead.email || '—';
+  document.getElementById('pInfoTel').textContent = lead.telefon || 'neuvedeno';
+  document.getElementById('pInfoProblem').textContent = lead.problem || 'neuvedeno';
+  document.getElementById('pInfoLokalita').textContent = lead.lokalita || 'neuvedeno';
+  document.getElementById('pInfoDatum').textContent = fmtDate(lead.datum || lead.created_at);
+
   document.getElementById('pStage').innerHTML = buildStageOptions(lead.stav);
+  const poz = getPoz(lead.stav) || '';
+  document.getElementById('pKategorie').value = poz;
+  document.getElementById('pKatDot').style.background = POZ_COLOR[poz];
+
   document.getElementById('pFollowup').value = lead.followup || '';
   document.getElementById('pNotes').value = lead.myNotes || '';
   document.getElementById('pCastka').value = lead.prodej_castka || '';
-  document.getElementById('pMena').value = lead.prodej_mena || 'Kč';
   document.getElementById('pProdukt').value = lead.prodej_produkt || '';
   document.getElementById('pProdejNote').value = lead.prodej_note || '';
   document.getElementById('pKampan').value = lead.campaign_name || '';
 
-  // accordion: otevři jen sekce, které už mají data
-  accOpen = {
-    prodej: !!(lead.prodej_castka || lead.prodej_note),
-    produkt: !!lead.prodej_produkt,
-    followup: !!lead.followup,
-    notes: !!lead.myNotes,
-    kampan: !!lead.campaign_name,
-  };
-  applyAccState();
+  document.getElementById('pKampanName').textContent = lead.campaign_name || 'Bez kampaně';
+  if (lead.ad_name){
+    document.getElementById('pKampanAd').style.display = 'flex';
+    document.getElementById('pKampanPlatform').textContent = platformShort(lead.platform);
+    document.getElementById('pKampanPlatform').style.background = PLATFORM_COLOR[(lead.platform||'FB').toUpperCase()] || '#1877F2';
+    document.getElementById('pKampanAdName').textContent = lead.ad_name;
+  } else {
+    document.getElementById('pKampanAd').style.display = 'none';
+  }
+  if (lead.firma){
+    document.getElementById('pKampanWeb').style.display = 'flex';
+    document.getElementById('pKampanWebText').textContent = lead.firma;
+  } else {
+    document.getElementById('pKampanWeb').style.display = 'none';
+  }
 
   document.getElementById('panelOverlay').classList.add('open');
   document.getElementById('leadPanel').classList.add('open');
 }
 
-function toggleAcc(name){
-  accOpen[name] = !accOpen[name];
-  applyAccState();
+function onKategorieChange(){
+  const poz = document.getElementById('pKategorie').value;
+  document.getElementById('pKatDot').style.background = POZ_COLOR[poz];
+  // nastav fázi na reprezentativní hodnotu dané kategorie
+  document.getElementById('pStage').value = POZ_DEFAULT_STAV[poz];
+}
+function onStageChange(){
+  const stav = document.getElementById('pStage').value;
+  const poz = getPoz(stav) || '';
+  document.getElementById('pKategorie').value = poz;
+  document.getElementById('pKatDot').style.background = POZ_COLOR[poz];
 }
 
-function applyAccState(){
-  ['prodej','produkt','followup','notes','kampan'].forEach(name => {
-    const sec = document.getElementById('acc-'+name);
-    const btn = document.getElementById('pt-btn-'+name);
-    if (sec) sec.classList.toggle('open', !!accOpen[name]);
-    if (btn) btn.classList.toggle('active', !!accOpen[name]);
-  });
+function copyLeadEmail(){
+  if (!currentLead) return;
+  navigator.clipboard.writeText(currentLead.email).then(() => showToast('Email zkopírován')).catch(()=>{});
+}
+function openMailClient(){
+  if (!currentLead) return;
+  window.location.href = 'mailto:' + currentLead.email;
 }
 
 function closePanel(e){
@@ -958,7 +1134,6 @@ function savePanel() {
   currentLead.followup       = document.getElementById('pFollowup').value;
   currentLead.myNotes        = document.getElementById('pNotes').value;
   currentLead.prodej_castka  = document.getElementById('pCastka').value;
-  currentLead.prodej_mena    = document.getElementById('pMena').value;
   currentLead.prodej_produkt = document.getElementById('pProdukt').value;
   currentLead.prodej_note    = document.getElementById('pProdejNote').value;
   currentLead.campaign_name  = document.getElementById('pKampan').value;
@@ -1001,7 +1176,7 @@ function renderStats(){
       <div class="big-stat"><div class="n">${total}</div><div class="l">Celkem leadů</div></div>
       <div class="big-stat"><div class="n" style="color:var(--green)">${uz.length}</div><div class="l">Uzavřených obchodů</div></div>
       <div class="big-stat"><div class="n" style="color:var(--accent2)">${convRate}%</div><div class="l">Konverze (uzavřeno/celkem)</div></div>
-      <div class="big-stat"><div class="n" style="color:var(--yellow)">${revenue.toLocaleString('cs-CZ')} Kč</div><div class="l">Celkový obrat</div></div>
+      <div class="big-stat"><div class="n" style="color:var(--yellow)">${revenue.toLocaleString('cs-CZ')} €</div><div class="l">Celkový obrat</div></div>
     </div>
     <div class="section-title">Rozložení podle fáze</div>
     <div class="table-wrap" style="padding:16px 18px;">
@@ -1019,15 +1194,13 @@ function renderStats(){
 // ============================================================
 // ZÁLOŽKA: EMAIL
 // ============================================================
-const EMAIL_PHASES = ['odeslat_email','email_odeslano','email_odpoved','uzavreno_emailem'];
-const EMAIL_LABELS = {odeslat_email:'Čeká na email', email_odeslano:'Odesláno', email_odpoved:'Odpověděli', uzavreno_emailem:'Uzavřeno'};
+const EMAIL_PHASES = ['komunikace_email','email_odeslano'];
+const EMAIL_LABELS = {komunikace_email:'Komunikace email', email_odeslano:'Email odeslán'};
 
 function renderEmail(){
   const groups = {};
   EMAIL_PHASES.forEach(p => groups[p] = leads.filter(l => l.stav === p));
   const totalInFunnel = EMAIL_PHASES.reduce((s,p)=>s+groups[p].length,0);
-  const closedCount = groups['uzavreno_emailem'].length;
-  const convRate = totalInFunnel ? (closedCount/totalInFunnel*100).toFixed(1) : '0.0';
 
   const kpiHtml = EMAIL_PHASES.map(p => `
     <div class="kpi-card">
@@ -1036,8 +1209,8 @@ function renderEmail(){
     </div>
   `).join('') + `
     <div class="kpi-card">
-      <div class="n" style="color:var(--green)">${convRate}%</div>
-      <div class="l">Konverze emailem</div>
+      <div class="n" style="color:var(--accent2)">${totalInFunnel}</div>
+      <div class="l">Celkem v emailové komunikaci</div>
     </div>
   `;
 
@@ -1047,7 +1220,7 @@ function renderEmail(){
     return `<div class="funnel-seg" style="width:${pct}%;background:${FAZE_MAP[p].color}" title="${EMAIL_LABELS[p]}: ${groups[p].length}">${pct>=8?groups[p].length:''}</div>`;
   }).join('') : `<div class="funnel-seg" style="width:100%;background:var(--bg3);color:var(--text-dim)">Zatím žádná data</div>`;
 
-  const waitingCount = groups['odeslat_email'].length;
+  const waitingCount = groups['komunikace_email'].length;
   const ctaHtml = waitingCount > 0 ? `
     <div class="cta-banner">
       <div class="txt">
@@ -1072,10 +1245,8 @@ function renderEmail(){
     <div class="kpi-grid">${kpiHtml}</div>
     <div class="funnel-bar">${funnelHtml}</div>
     ${ctaHtml}
-    <div class="email-section"><h4>Čeká na odeslání</h4>${cardsFor(groups['odeslat_email'])}</div>
-    <div class="email-section"><h4>Odesláno</h4>${cardsFor(groups['email_odeslano'])}</div>
-    <div class="email-section"><h4>Odpověděli</h4>${cardsFor(groups['email_odpoved'])}</div>
-    <div class="email-section"><h4>Uzavřeno emailem</h4>${cardsFor(groups['uzavreno_emailem'])}</div>
+    <div class="email-section"><h4>Komunikace email</h4>${cardsFor(groups['komunikace_email'])}</div>
+    <div class="email-section"><h4>Email odeslán</h4>${cardsFor(groups['email_odeslano'])}</div>
   `;
 }
 
@@ -1121,7 +1292,7 @@ function renderKampane(){
               <td>${r.leadCount}</td>
               <td>${r.salesCount}</td>
               <td>${r.conv}%</td>
-              <td>${r.revenue.toLocaleString('cs-CZ')} Kč</td>
+              <td>${r.revenue.toLocaleString('cs-CZ')} €</td>
               <td>${r.spend ? r.spend.toLocaleString('cs-CZ')+' Kč' : '<span class="muted">–</span>'}</td>
               <td>${r.cpl ? r.cpl.toFixed(0)+' Kč' : '<span class="muted">–</span>'}</td>
               <td class="${r.roas>=3?'roas-good':(r.roas>0?'roas-bad':'')}">${r.roas ? r.roas.toFixed(2)+'x' : '<span class="muted">–</span>'}</td>
