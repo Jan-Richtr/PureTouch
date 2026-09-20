@@ -192,6 +192,30 @@ tbody tr:last-child td{border-bottom:none;}
 .panel.open{transform:translateX(0);}
 .panel h3{margin:0 0 2px;font-size:22px;font-family:var(--font-display);font-weight:700;color:var(--accent2);}
 .panel .sub{color:var(--text-dim);font-size:13px;margin-bottom:18px;}
+/* ===== LOGIN ===== */
+.login-overlay{
+  position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.login-card{
+  width:100%;max-width:360px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:32px 28px;box-shadow:var(--shadow);text-align:center;
+}
+.login-card .login-logo{
+  font-family:var(--font-display);font-weight:600;font-size:24px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--accent2);margin-bottom:4px;
+}
+.login-card .login-sub{font-size:12.5px;color:var(--text-dim);margin-bottom:26px;}
+.login-card .field-full{text-align:left;}
+.login-card input{
+  width:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);
+  background:var(--bg3);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;outline:none;transition:border-color .15s, box-shadow .15s, background .15s;
+}
+.login-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(138,115,97,.16);background:#fff;}
+.login-card .btn-primary{width:100%;padding:11px;margin-top:6px;font-size:14px;}
+.login-error{color:var(--red);font-size:12.5px;margin:10px 0 0;min-height:16px;}
+
 .panel-close{
   position:absolute;top:16px;right:16px;background:var(--bg3);border:1px solid var(--border);
   color:var(--text);width:30px;height:30px;border-radius:8px;font-size:15px;
@@ -369,13 +393,31 @@ tbody tr:last-child td{border-bottom:none;}
 </head>
 <body>
 
+<!-- PŘIHLÁŠENÍ -->
+<div class="login-overlay" id="loginOverlay">
+  <form class="login-card" id="loginForm" onsubmit="return attemptLogin(event)">
+    <div class="login-logo">○ Pure Touch</div>
+    <div class="login-sub">Přístup pouze pro autorizované uživatele</div>
+    <div class="field-full" style="margin-bottom:12px;">
+      <label style="display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Jméno</label>
+      <input type="text" id="loginUser" autocomplete="username" required>
+    </div>
+    <div class="field-full" style="margin-bottom:6px;">
+      <label style="display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Heslo</label>
+      <input type="password" id="loginPass" autocomplete="current-password" required>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button type="submit" class="btn btn-primary">Přihlásit se</button>
+  </form>
+</div>
+
+
 <!-- TOP BAR -->
 <div class="topbar">
   <div class="brand"><span class="dot"></span> PURE TOUCH</div>
   <div class="tabs">
     <button class="tab" data-tab="table" onclick="setTab('table')">📋 Tabulka</button>
     <button class="tab" data-tab="stats" onclick="setTab('stats')">📈 Statistiky</button>
-    <button class="tab" data-tab="email" onclick="setTab('email')">📧 Email</button>
     <button class="tab" data-tab="kampane" onclick="setTab('kampane')">📊 Kampaně</button>
     <button class="tab" data-tab="denni" onclick="setTab('denni')">📅 Denní</button>
   </div>
@@ -383,7 +425,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="top-actions">
     <span class="sync-badge" id="syncBadge">–</span>
     <button class="icon-btn" title="Obnovit data" onclick="loadAll()">⟳</button>
-    <button class="icon-btn ic-tan" title="Import ze Sheetu" onclick="syncFromSheet()">📥</button>
+    <button class="btn btn-primary" onclick="syncFromSheet()">📥 Aktualizovat leady</button>
   </div>
 </div>
 
@@ -439,8 +481,6 @@ tbody tr:last-child td{border-bottom:none;}
   <div id="view-stats" style="display:none;"></div>
 
   <!-- EMAIL -->
-  <div id="view-email" style="display:none;"></div>
-
   <!-- KAMPANĚ -->
   <div id="view-kampane" style="display:none;"></div>
 
@@ -454,7 +494,6 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="bn-row">
     <button class="bn-item" id="bn-table" onclick="setTab('table')"><span class="ic">📋</span>Leady</button>
     <button class="bn-item" id="bn-stats" onclick="setTab('stats')"><span class="ic">📈</span>Stats</button>
-    <button class="bn-item" id="bn-email" onclick="setTab('email')"><span class="ic">📧</span>Email</button>
     <button class="bn-item" id="bn-kampane" onclick="setTab('kampane')"><span class="ic">📊</span>Kampaně</button>
     <button class="bn-item" id="bn-denni" onclick="setTab('denni')"><span class="ic">📅</span>Denní</button>
   </div>
@@ -801,14 +840,13 @@ function setTab(t) {
   currentTab = t;
   document.querySelectorAll('.tab').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === t));
-  ['table','stats','email','kampane','denni'].forEach(id => {
+  ['table','stats','kampane','denni'].forEach(id => {
     const el = document.getElementById('bn-'+id);
     if (el) el.classList.toggle('active', id === t);
   });
   document.getElementById('view-table').style.display   = (t==='table' && !mob()) ? '' : 'none';
   document.getElementById('view-cards').style.display   = (t==='table' &&  mob()) ? 'block' : 'none';
   document.getElementById('view-stats').style.display   = t==='stats'   ? 'block' : 'none';
-  document.getElementById('view-email').style.display   = t==='email'   ? 'block' : 'none';
   document.getElementById('view-kampane').style.display = t==='kampane' ? 'block' : 'none';
   document.getElementById('view-denni').style.display   = t==='denni'   ? 'block' : 'none';
   render();
@@ -857,7 +895,6 @@ function render() {
   if      (currentTab === 'table' && !isMobile()) renderTable();
   else if (currentTab === 'table' &&  isMobile()) renderCards();
   else if (currentTab === 'stats')    renderStats();
-  else if (currentTab === 'email')    renderEmail();
   else if (currentTab === 'kampane')  renderKampane();
   else if (currentTab === 'denni')    renderDenni();
 }
@@ -1195,65 +1232,6 @@ function renderStats(){
 }
 
 // ============================================================
-// ZÁLOŽKA: EMAIL
-// ============================================================
-const EMAIL_PHASES = ['komunikace_email','email_odeslano'];
-const EMAIL_LABELS = {komunikace_email:'Komunikace email', email_odeslano:'Email odeslán'};
-
-function renderEmail(){
-  const groups = {};
-  EMAIL_PHASES.forEach(p => groups[p] = leads.filter(l => l.stav === p));
-  const totalInFunnel = EMAIL_PHASES.reduce((s,p)=>s+groups[p].length,0);
-
-  const kpiHtml = EMAIL_PHASES.map(p => `
-    <div class="kpi-card">
-      <div class="n" style="color:${FAZE_MAP[p].color}">${groups[p].length}</div>
-      <div class="l">${EMAIL_LABELS[p]}</div>
-    </div>
-  `).join('') + `
-    <div class="kpi-card">
-      <div class="n" style="color:var(--accent2)">${totalInFunnel}</div>
-      <div class="l">Celkem v emailové komunikaci</div>
-    </div>
-  `;
-
-  const funnelHtml = totalInFunnel ? EMAIL_PHASES.map(p => {
-    const pct = (groups[p].length/totalInFunnel*100);
-    if (pct <= 0) return '';
-    return `<div class="funnel-seg" style="width:${pct}%;background:${FAZE_MAP[p].color}" title="${EMAIL_LABELS[p]}: ${groups[p].length}">${pct>=8?groups[p].length:''}</div>`;
-  }).join('') : `<div class="funnel-seg" style="width:100%;background:var(--bg3);color:var(--text-dim)">Zatím žádná data</div>`;
-
-  const waitingCount = groups['komunikace_email'].length;
-  const ctaHtml = waitingCount > 0 ? `
-    <div class="cta-banner">
-      <div class="txt">
-        <strong>${waitingCount} ${waitingCount===1?'lead čeká':'leadů čeká'} na email draft</strong>
-        <div>Napiš mi "zpracuj emaily" a vytvořím Gmail drafty (skill vrads-lead-email-drafts).</div>
-      </div>
-      <button class="btn btn-primary" onclick="showToast('Napiš do chatu: \\'zpracuj emaily\\' — Claude vytvoří Gmail drafty')">✉️ Zpracovat emaily</button>
-    </div>
-  ` : '';
-
-  function cardsFor(list){
-    if (!list.length) return `<div class="muted" style="font-size:13px;">Žádní leadi v této fázi.</div>`;
-    return `<div class="email-cards">` + list.map(l => `
-      <div class="email-card" onclick="openLeadPanel('${escAttr(l.email)}')">
-        <div class="n">${esc(l.jmeno)||esc(l.email)}</div>
-        <div class="f">${esc(l.firma)||''}</div>
-      </div>
-    `).join('') + `</div>`;
-  }
-
-  document.getElementById('view-email').innerHTML = `
-    <div class="kpi-grid">${kpiHtml}</div>
-    <div class="funnel-bar">${funnelHtml}</div>
-    ${ctaHtml}
-    <div class="email-section"><h4>Komunikace email</h4>${cardsFor(groups['komunikace_email'])}</div>
-    <div class="email-section"><h4>Email odeslán</h4>${cardsFor(groups['email_odeslano'])}</div>
-  `;
-}
-
-// ============================================================
 // ZÁLOŽKA: KAMPANĚ
 // ============================================================
 function renderKampane(){
@@ -1528,12 +1506,40 @@ async function syncFromSheet(){
 }
 
 // ============================================================
+// PŘIHLÁŠENÍ (jednoduchá klientská ochrana)
+// ============================================================
+const AUTH_USER = 'Eva1';
+const AUTH_PASS = 'PureTouch1?';
+
+function attemptLogin(e){
+  if (e) e.preventDefault();
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if (u === AUTH_USER && p === AUTH_PASS){
+    localStorage.setItem('pt_auth', 'ok');
+    document.getElementById('loginOverlay').style.display = 'none';
+    startApp();
+  } else {
+    document.getElementById('loginError').textContent = 'Nesprávné jméno nebo heslo.';
+  }
+  return false;
+}
+
+function startApp(){
+  setTab('table');
+  loadAll();
+}
+
+// ============================================================
 // INIT
 // ============================================================
 window.addEventListener('resize', () => render());
 document.addEventListener('DOMContentLoaded', () => {
-  setTab('table');
-  loadAll();
+  if (localStorage.getItem('pt_auth') === 'ok'){
+    document.getElementById('loginOverlay').style.display = 'none';
+    startApp();
+  }
+  // jinak zůstává viditelný přihlašovací overlay a CRM se nenačítá
 });
 </script>
 </body>
