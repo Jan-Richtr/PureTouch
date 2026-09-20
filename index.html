@@ -128,7 +128,7 @@ input,select,textarea{font-family:inherit;}
 .stat-chip.fu .num{color:#f472b6;}
 
 /* ===== TABLE ===== */
-.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;overflow-y:hidden;box-shadow:var(--shadow);-webkit-overflow-scrolling:touch;}
 table{width:100%;border-collapse:collapse;font-size:13.5px;}
 thead th{
   text-align:left;padding:11px 14px;background:var(--bg3);
@@ -140,7 +140,7 @@ thead th{
 thead th:hover{color:var(--text);}
 thead th .sort-arrow{opacity:.5;font-size:10px;margin-left:3px;}
 thead th.sorted .sort-arrow{opacity:1;color:var(--accent2);}
-tbody td{padding:11px 14px;border-bottom:1px solid var(--border);}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
 tbody tr{cursor:pointer;transition:.12s;}
 tbody tr:hover{background:var(--bg3);}
 tbody tr:last-child td{border-bottom:none;}
@@ -384,10 +384,6 @@ tbody tr:last-child td{border-bottom:none;}
     <span class="sync-badge" id="syncBadge">–</span>
     <button class="icon-btn" title="Obnovit data" onclick="loadAll()">⟳</button>
     <button class="icon-btn ic-tan" title="Import ze Sheetu" onclick="syncFromSheet()">📥</button>
-    <button class="icon-btn ic-blue" title="Email" onclick="setTab('email')">📧</button>
-    <button class="icon-btn ic-green" title="Statistiky" onclick="setTab('stats')">📊</button>
-    <button class="icon-btn ic-dark" title="Kampaně" onclick="setTab('kampane')">📣</button>
-    <button class="btn btn-primary" onclick="openNewLead()">+ Lead</button>
   </div>
 </div>
 
@@ -932,19 +928,23 @@ function renderTable(){
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.lokalita)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
       <td class="cell-kategorie">
-        <span class="kategorie-dot" style="background:${pozColor};display:inline-block;width:8px;height:8px;border-radius:50%;"></span>
-        <select class="inline-select" style="color:${pozColor}" onclick="event.stopPropagation()" onchange="inlineSetKategorie('${escAttr(l.email)}', this.value)">
-          <option value="otevreno" ${poz==='otevreno'?'selected':''}>otevřen</option>
-          <option value="uzavreno" ${poz==='uzavreno'?'selected':''}>uzavřer</option>
-          <option value="konec" ${poz==='konec'?'selected':''}>konec</option>
-          <option value="" ${poz===''?'selected':''}>bez stavu</option>
-        </select>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;width:100%;" onclick="event.stopPropagation()">
+          <span class="kategorie-dot" style="background:${pozColor};display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;"></span>
+          <select class="inline-select" style="color:${pozColor};flex:1;" onchange="inlineSetKategorie('${escAttr(l.email)}', this.value)">
+            <option value="otevreno" ${poz==='otevreno'?'selected':''}>otevřen</option>
+            <option value="uzavreno" ${poz==='uzavreno'?'selected':''}>uzavřer</option>
+            <option value="konec" ${poz==='konec'?'selected':''}>konec</option>
+            <option value="" ${poz===''?'selected':''}>bez stavu</option>
+          </select>
+        </label>
       </td>
       <td class="cell-fáze">
-        <select class="inline-select" style="color:${f.color}" onclick="event.stopPropagation()" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
-          ${buildStageOptions(l.stav)}
-        </select>
-        <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
+        <label style="display:block;cursor:pointer;width:100%;" onclick="event.stopPropagation()">
+          <select class="inline-select" style="color:${f.color};width:100%;" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
+            ${buildStageOptions(l.stav)}
+          </select>
+          <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
+        </label>
       </td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${castka}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.prodej_produkt)||'<span class="muted">–</span>'}</td>
