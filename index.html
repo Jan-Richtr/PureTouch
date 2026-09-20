@@ -129,7 +129,7 @@ input,select,textarea{font-family:inherit;}
 
 /* ===== TABLE ===== */
 .table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;overflow-y:hidden;box-shadow:var(--shadow);-webkit-overflow-scrolling:touch;}
-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+table{min-width:100%;border-collapse:collapse;font-size:13.5px;}
 thead th{
   text-align:left;padding:11px 14px;background:var(--bg3);
   color:var(--text-dim);font-weight:600;font-size:11.5px;
@@ -467,11 +467,6 @@ tbody tr:last-child td{border-bottom:none;}
     <button class="panel-close" onclick="closePanel()">✕</button>
     <h3 id="pName">—</h3>
     <div class="sub" id="pFirma">—</div>
-
-    <div class="email-btns">
-      <button class="btn" onclick="copyLeadEmail()">📧 Email</button>
-      <button class="btn" onclick="openMailClient()">✉️ Email</button>
-    </div>
 
     <div class="two-col">
       <div>
@@ -940,7 +935,7 @@ function renderTable(){
       </td>
       <td class="cell-fáze">
         <label style="display:block;cursor:pointer;width:100%;" onclick="event.stopPropagation()">
-          <select class="inline-select" style="color:${f.color};width:100%;" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
+          <select class="inline-select" style="color:${f.color};white-space:nowrap;" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
             ${buildStageOptions(l.stav)}
           </select>
           <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
