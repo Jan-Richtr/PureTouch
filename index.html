@@ -435,7 +435,7 @@ tbody tr:last-child td{border-bottom:none;}
     <option value="">Všechny fáze</option>
   </select>
   <select id="filterService" onchange="onFilterChange()">
-    <option value="">Vše – služby</option>
+    <option value="">Vše – kontakt</option>
   </select>
   <select id="filterProdej" onchange="onFilterChange()">
     <option value="">Prodej – vše</option>
@@ -458,9 +458,8 @@ tbody tr:last-child td{border-bottom:none;}
           <th data-sort="jmeno">Jméno <span class="sort-arrow">▲</span></th>
           <th>Telefon</th>
           <th>Email</th>
-          <th>Problém</th>
-          <th>Lokalita</th>
-          <th>Služba</th>
+          <th>Jak kontaktovat</th>
+          <th>Kdy začít</th>
           <th>Poznámka</th>
           <th data-sort="stav">Fáze <span class="sort-arrow">▲</span></th>
           <th>€</th>
@@ -531,12 +530,12 @@ tbody tr:last-child td{border-bottom:none;}
     </div>
 
     <div class="info-box" style="margin-bottom:14px;">
-      <div class="ibl">Problém / zájem</div>
+      <div class="ibl">Kdy chce začít</div>
       <div class="ibv" id="pInfoProblem">—</div>
     </div>
 
     <div class="two-col">
-      <div class="info-box"><div class="ibl">Lokalita</div><div class="ibv" id="pInfoLokalita">—</div></div>
+      <div class="info-box"><div class="ibl">Jak kontaktovat</div><div class="ibv" id="pInfoLokalita">—</div></div>
       <div class="info-box"><div class="ibl">Datum přijetí</div><div class="ibv" id="pInfoDatum">—</div></div>
     </div>
 
@@ -595,7 +594,7 @@ const SB = 'https://gcrpcrlcaqfbxtjizysb.supabase.co';
 const SK = 'sb_publishable_H9DvsObN_UNX5eBXEBza-Q_mEdetygN';
 const H  = {'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json'};
 
-const GSHEET_URL = 'https://docs.google.com/spreadsheets/d/1zGTYtVOjteFdunrItxKyfsVZKTDnWeP3pzQ3QnyeWAE/export?format=csv&gid=0';
+const GSHEET_URL = 'https://docs.google.com/spreadsheets/d/10exnWTLmSPesrHW2Z58aBTvSyBDcCQ4srEr9FvmiHSw/export?format=csv&gid=0';
 
 // ---------- FAZE MODEL ----------
 const FAZE = [
@@ -730,7 +729,7 @@ function populateFilters(){
   if (svcSel){
     const cur = svcSel.value;
     const services = [...new Set(leads.map(l=>l.sluzba).filter(Boolean))].sort();
-    svcSel.innerHTML = '<option value="">Vše – služby</option>' +
+    svcSel.innerHTML = '<option value="">Vše – kontakt</option>' +
       services.map(s => `<option value="${escAttr(s)}">${esc(s)}</option>`).join('');
     svcSel.value = cur;
   }
@@ -863,7 +862,8 @@ function getFiltered(){
     out = out.filter(l =>
       (l.jmeno||'').toLowerCase().includes(searchTerm) ||
       (l.firma||'').toLowerCase().includes(searchTerm) ||
-      (l.email||'').toLowerCase().includes(searchTerm)
+      (l.email||'').toLowerCase().includes(searchTerm) ||
+      (l.telefon||'').toLowerCase().includes(searchTerm)
     );
   }
   if (filterStage) out = out.filter(l => l.stav === filterStage);
@@ -937,7 +937,7 @@ function renderTable(){
   });
 
   if (!filtered.length){
-    tbody.innerHTML = `<tr><td colspan="14"><div class="empty-state">Žádní leadi neodpovídají filtru.</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="13"><div class="empty-state">Žádní leadi neodpovídají filtru.</div></td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map(l => {
@@ -954,9 +954,8 @@ function renderTable(){
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.jmeno)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.telefon)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.email)}</td>
-      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.problem)||'<span class="muted">–</span>'}</td>
-      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.lokalita)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.problem)||'<span class="muted">–</span>'}</td>
       <td class="cell-kategorie">
         <div style="display:flex;align-items:center;gap:6px;cursor:pointer;width:100%;" onclick="event.stopPropagation();openInlineSelect(this)">
           <span class="kategorie-dot" style="background:${pozColor};display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;pointer-events:none;"></span>
@@ -1073,7 +1072,7 @@ function openLeadPanel(email){
   document.getElementById('pInfoEmail').textContent = lead.email || '—';
   document.getElementById('pInfoTel').textContent = lead.telefon || 'neuvedeno';
   document.getElementById('pInfoProblem').textContent = lead.problem || 'neuvedeno';
-  document.getElementById('pInfoLokalita').textContent = lead.lokalita || 'neuvedeno';
+  document.getElementById('pInfoLokalita').textContent = lead.sluzba || 'neuvedeno';
   document.getElementById('pInfoDatum').textContent = fmtDate(lead.datum || lead.created_at);
 
   document.getElementById('pStage').innerHTML = buildStageOptions(lead.stav);
@@ -1444,60 +1443,81 @@ function normalizeHeader(h){
     .replace(/ů/g,'u').replace(/ý/g,'y').replace(/ž/g,'z');
 }
 
-const HEADER_MAP = {
-  'jmeno':'jmeno', 'jmeno a prijmeni':'jmeno', 'name':'jmeno',
-  'firma':'firma', 'company':'firma',
-  'email':'email', 'e-mail':'email',
-  'telefon':'telefon', 'phone':'telefon',
-  'zajem':'sluzba', 'sluzba':'sluzba', 'service':'sluzba',
-  'kampan':'campaign_name', 'campaign':'campaign_name', 'campaign_name':'campaign_name',
-  'kreativa':'ad_name', 'ad':'ad_name', 'ad_name':'ad_name',
-  'datum':'datum', 'date':'datum',
-  'platforma':'platform', 'platform':'platform',
-  'problem':'problem',
-  'lokalita':'lokalita', 'mesto':'lokalita', 'city':'lokalita', 'misto':'lokalita'
-};
+// Mapování sloupců Meta Lead Ads formuláře -> pole v CRM
+function mapHeader(h){
+  const n = normalizeHeader(h).replace(/\s+/g,'_');
+  if (n === 'e-mail' || n === 'email') return 'email';
+  if (n === 'cele_jmeno' || n === 'jmeno' || n === 'full_name') return 'jmeno';
+  if (n === 'phone_number' || n === 'telefon' || n === 'phone') return 'telefon';
+  if (n === 'created_time') return 'datum';
+  if (n === 'campaign_name') return 'campaign_name';
+  if (n === 'ad_name') return 'ad_name';
+  if (n === 'platform') return 'platform';
+  if (n === 'form_name') return 'form_name';
+  if (n.startsWith('jak_vas_mame')) return 'kontakt';   // Jak vás máme nejlépe kontaktovat?
+  if (n.startsWith('kdy_byste')) return 'zacit';       // Kdy byste chtěl/a začít?
+  return n;
+}
 
-async function syncFromSheet(){
-  showSync('⏳ Stahuji ze Sheetu…', '#d97706');
+function cleanChoice(v){
+  let t = (v||'').replace(/_/g,' ').trim();
+  if (!t) return '';
+  const low = t.toLowerCase();
+  if (low === 'whatsapp') return 'WhatsApp';
+  if (low === 'sms') return 'SMS';
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+function cleanPhone(v){ return (v||'').replace(/^p:/i,'').trim(); }
+function toPragueDate(v){
+  const d = new Date(v);
+  if (isNaN(d)) return new Date().toISOString().slice(0,10);
+  return d.toLocaleDateString('sv-SE', {timeZone:'Europe/Prague'}); // YYYY-MM-DD
+}
+
+async function syncFromSheet(silent){
+  if (silent !== true) showSync('⏳ Stahuji ze Sheetu…', '#d97706');
   try{
     const res = await fetch(GSHEET_URL);
     if (!res.ok) throw new Error('Nepodařilo se stáhnout Google Sheet');
     const text = await res.text();
     const rows = parseCSV(text);
-    if (rows.length < 2) throw new Error('Sheet je prázdný');
+    if (rows.length < 2) { if (silent !== true) showToast('Sheet zatím neobsahuje žádné leady'); showSync('✅ Synchronizováno','#16a34a'); return; }
 
-    const headers = rows[0].map(h => HEADER_MAP[normalizeHeader(h)] || normalizeHeader(h).replace(/\s+/g,'_'));
-    const dataRows = rows.slice(1);
-
-    let inserted = 0, updated = 0, skipped = 0;
-    for (const r of dataRows){
+    const headers = rows[0].map(mapHeader);
+    const known = new Set(leads.map(l => l.email));
+    const batch = new Map();   // email -> body (duplicity ve Sheetu se sloučí)
+    let skipped = 0;
+    for (const r of rows.slice(1)){
       const obj = {};
       headers.forEach((h,i) => obj[h] = (r[i]||'').trim());
-      if (!obj.email){ skipped++; continue; }
-
-      const exists = leads.find(l => l.email === obj.email);
-      const body = {
-        email: obj.email, jmeno: obj.jmeno||'', firma: obj.firma||'',
-        telefon: obj.telefon||'', datum: obj.datum || new Date().toISOString().slice(0,10),
-        zdroj: 'Google Sheet', sluzba: obj.sluzba||'', problem: obj.problem||'',
-        lokalita: obj.lokalita||'', campaign_name: obj.campaign_name||'', ad_name: obj.ad_name||'',
-        platform: obj.platform||''
-      };
-      if (exists){
-        const r2 = await fetch(SB+'/rest/v1/leads?email=eq.'+encodeURIComponent(obj.email), {
-          method:'PATCH', headers:{...H,'Prefer':'return=minimal'}, body: JSON.stringify(body)
-        });
-        if (r2.ok) updated++; else skipped++;
-      } else {
-        const r2 = await fetch(SB+'/rest/v1/leads', {
-          method:'POST', headers:{...H,'Prefer':'return=minimal'}, body: JSON.stringify(body)
-        });
-        if (r2.ok) inserted++; else skipped++;
-      }
+      const email = (obj.email||'').toLowerCase();
+      if (!email){ skipped++; continue; }
+      batch.set(email, {
+        email,
+        jmeno: obj.jmeno || '',
+        telefon: cleanPhone(obj.telefon),
+        datum: toPragueDate(obj.datum),
+        zdroj: obj.form_name || 'Meta formulář',
+        sluzba: cleanChoice(obj.kontakt),     // sloupec "Jak kontaktovat"
+        problem: cleanChoice(obj.zacit),      // sloupec "Kdy začít"
+        campaign_name: obj.campaign_name || '',
+        ad_name: obj.ad_name || '',
+        platform: (obj.platform || '').toUpperCase()
+      });
     }
-    showSync('✅ Import hotov', '#16a34a');
-    showToast(`Import: ${inserted} nových, ${updated} aktualizováno, ${skipped} přeskočeno`);
+    const bodies = [...batch.values()];
+    let inserted = 0, updated = 0;
+    if (bodies.length){
+      const r2 = await fetch(SB+'/rest/v1/leads?on_conflict=email', {
+        method:'POST',
+        headers:{...H,'Prefer':'resolution=merge-duplicates,return=minimal'},
+        body: JSON.stringify(bodies)
+      });
+      if (!r2.ok) throw new Error(await r2.text());
+      bodies.forEach(b => known.has(b.email) ? updated++ : inserted++);
+    }
+    showSync('✅ Synchronizováno', '#16a34a');
+    if (silent !== true || inserted > 0) showToast(`Leady: ${inserted} nových, ${updated} aktualizováno${skipped?`, ${skipped} přeskočeno`:''}`);
     await loadAll();
   }catch(e){
     showSync('⚠️ Chyba importu', '#ef4444');
@@ -1527,7 +1547,8 @@ function attemptLogin(e){
 
 function startApp(){
   setTab('table');
-  loadAll();
+  // při otevření CRM se nejdřív načte databáze a pak se automaticky doplní nové leady ze Sheetu
+  loadAll().then(() => syncFromSheet(true));
 }
 
 // ============================================================
