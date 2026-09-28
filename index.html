@@ -235,6 +235,27 @@ tbody tr:last-child td{border-bottom:none;}
 }
 .panel-actions{display:flex;gap:8px;margin-top:18px;}
 
+
+/* ===== Klikací "bublinky" (skutečný select je průhledný přes celou bublinu) ===== */
+.pill{
+  position:relative;display:inline-flex;flex-wrap:nowrap;align-items:center;gap:6px;
+  padding:6px 11px;border-radius:999px;cursor:pointer;
+  background:color-mix(in srgb, var(--c) 13%, #fff);
+  border:1px solid color-mix(in srgb, var(--c) 38%, #fff);
+  color:var(--c);font-size:12.5px;font-weight:700;white-space:nowrap;
+  transition:box-shadow .15s, border-color .15s, transform .05s;
+}
+.pill:hover{border-color:var(--c);box-shadow:0 2px 8px color-mix(in srgb, var(--c) 28%, transparent);}
+.pill:active{transform:scale(.98);}
+.pill-dot{width:8px;height:8px;border-radius:50%;background:var(--c);flex-shrink:0;}
+.pill-chev{font-size:11px;opacity:.75;margin-left:2px;}
+.pill-faze{display:inline-grid;grid-template-columns:auto auto;column-gap:6px;row-gap:1px;align-items:center;justify-content:start;padding:6px 12px;border-radius:14px;}
+.pill-faze .date-sub{grid-column:1 / -1;margin:0;font-size:10.5px;color:var(--text-dim);font-weight:500;}
+.pill-native{
+  position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;
+  font-size:16px;border:0;padding:0;margin:0;-webkit-appearance:menulist;appearance:auto;
+}
+
 /* ===== Sjednocený vzhled formulářových polí v panelu ===== */
 .panel input[type="text"], .panel input[type="number"], .panel input[type="date"],
 .panel textarea, .panel select {
@@ -619,7 +640,7 @@ function getPoz(stav) { return (FAZE_MAP[stav] || FAZE[0]).poz; }
 function getFaze(stav) { return FAZE_MAP[stav] || FAZE[0]; }
 
 const POZ_COLOR = {otevreno:'#eab308', uzavreno:'#22c55e', konec:'#ef4444', '':'#64748b'};
-const POZ_LABEL = {otevreno:'otevřen', uzavreno:'uzavřer', konec:'konec', '':'bez stavu'};
+const POZ_LABEL = {otevreno:'otevřen', uzavreno:'uzavřen', konec:'konec', '':'bez stavu'};
 // reprezentativní fáze při rychlém přepnutí kategorie
 const POZ_DEFAULT_STAV = {otevreno:'volat', uzavreno:'poskytnuta_sluzba', konec:'konec', '':''};
 
@@ -957,22 +978,26 @@ function renderTable(){
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.problem)||'<span class="muted">–</span>'}</td>
       <td class="cell-kategorie">
-        <div style="display:flex;align-items:center;gap:6px;cursor:pointer;width:100%;" onclick="event.stopPropagation();openInlineSelect(this)">
-          <span class="kategorie-dot" style="background:${pozColor};display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;pointer-events:none;"></span>
-          <select class="inline-select" style="color:${pozColor};flex:1;pointer-events:none;" onchange="inlineSetKategorie('${escAttr(l.email)}', this.value)">
+        <div class="pill" style="--c:${pozColor}" title="Klikni pro změnu">
+          <span class="pill-dot"></span>
+          <span class="pill-text">${POZ_LABEL[poz]}</span>
+          <span class="pill-chev">▾</span>
+          <select class="pill-native" onchange="inlineSetKategorie('${escAttr(l.email)}', this.value)">
             <option value="otevreno" ${poz==='otevreno'?'selected':''}>otevřen</option>
-            <option value="uzavreno" ${poz==='uzavreno'?'selected':''}>uzavřer</option>
+            <option value="uzavreno" ${poz==='uzavreno'?'selected':''}>uzavřen</option>
             <option value="konec" ${poz==='konec'?'selected':''}>konec</option>
             <option value="" ${poz===''?'selected':''}>bez stavu</option>
           </select>
         </div>
       </td>
       <td class="cell-fáze">
-        <div style="cursor:pointer;width:100%;" onclick="event.stopPropagation();openInlineSelect(this)">
-          <select class="inline-select" style="color:${f.color};white-space:nowrap;pointer-events:none;" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
+        <div class="pill pill-faze" style="--c:${f.color}" title="Klikni pro změnu">
+          <span class="pill-text">${l.stav ? f.label : 'Vybrat fázi'}</span>
+          <span class="pill-chev">▾</span>
+          <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
+          <select class="pill-native" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
             ${buildStageOptions(l.stav)}
           </select>
-          <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
         </div>
       </td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${castka}</td>
