@@ -247,6 +247,34 @@ tbody tr:last-child td{border-bottom:none;}
 .date-clear{border:none;background:transparent;color:var(--text-dim);font-size:15px;line-height:1;cursor:pointer;padding:0 3px;border-radius:50%;}
 .date-clear:hover{color:var(--red);}
 
+
+/* Sloupec Jméno zůstává vidět při posunu tabulky do stran (hlavně na telefonu) */
+#tableHeadRow th:nth-child(2), #tableBody td:nth-child(2){
+  position:sticky;left:0;z-index:2;background:var(--bg2);box-shadow:1px 0 0 var(--border);
+}
+#tableHeadRow th:nth-child(2){background:var(--bg3);z-index:3;}
+#tableBody tr:hover td:nth-child(2){background:var(--bg3);}
+
+
+/* ===== Karty na telefonu ===== */
+.only-mobile{display:none;}
+.mcard{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+.mcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;cursor:pointer;}
+.mcard-name{font-size:17px;font-weight:700;line-height:1.25;}
+.mcard-date{font-size:12px;color:var(--text-dim);white-space:nowrap;padding-top:3px;}
+.mcard-contact{display:flex;flex-direction:column;gap:5px;margin-top:8px;font-size:14px;}
+.mcard-contact a{color:var(--accent2);text-decoration:none;font-weight:600;word-break:break-all;}
+.mcard-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding:10px 12px;background:var(--bg3);border-radius:10px;cursor:pointer;}
+.mlbl{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;}
+.mval{font-size:14px;font-weight:600;margin-top:2px;}
+.mcard-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:flex-start;}
+.mcard-fu{display:flex;align-items:center;gap:10px;margin-top:12px;}
+.mcard-sale,.mcard-note,.mcard-camp{margin-top:10px;font-size:13.5px;cursor:pointer;}
+.mcard-note{color:var(--text-dim);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.mcard-camp{color:var(--text-dim);font-size:12.5px;}
+.mcard-more{width:100%;margin-top:12px;padding:11px;border:1px solid var(--border);background:var(--bg3);color:var(--accent2);border-radius:10px;font-size:13.5px;font-weight:700;}
+.mcard-more:active{background:var(--border);}
+
 /* ===== Klikací "bublinky" (skutečný select je průhledný přes celou bublinu) ===== */
 .pill{
   position:relative;display:inline-flex;flex-wrap:nowrap;align-items:center;gap:6px;
@@ -411,15 +439,17 @@ tbody tr:last-child td{border-bottom:none;}
 @media (max-width:700px){
   .tabs{display:none;}
   .bottom-nav{display:block;}
-  .table-wrap{display:none;}
   .searchbox{min-width:0;flex:1;}
+  .top-actions{width:100%;}
+  .top-actions .btn{flex:1 0 auto;padding:9px 12px;font-size:13px;white-space:nowrap;}
+  .sync-badge{font-size:11px;min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .icon-btn{flex-shrink:0;}
   .topbar{padding:12px 14px;gap:10px;}
   .container{padding:14px 14px 30px;}
   .panel{width:100%;}
+  .table-wrap{display:none;}
+  .only-mobile{display:inline-block;}
   .phase-row .plabel{flex:0 0 120px;font-size:12px;}
-}
-@media (min-width:701px){
-  .cards{display:none;}
 }
 </style>
 </head>
@@ -469,6 +499,12 @@ tbody tr:last-child td{border-bottom:none;}
   <select id="filterService" onchange="onFilterChange()">
     <option value="">Vše – kontakt</option>
   </select>
+  <select id="sortSel" class="only-mobile" onchange="onSortSel()">
+    <option value="datum:desc">Řadit: nejnovější</option>
+    <option value="datum:asc">Řadit: nejstarší</option>
+    <option value="jmeno:asc">Řadit: jméno A–Z</option>
+    <option value="stav:asc">Řadit: fáze</option>
+  </select>
   <select id="filterProdej" onchange="onFilterChange()">
     <option value="">Prodej – vše</option>
     <option value="ano">Jen s prodejem</option>
@@ -506,6 +542,8 @@ tbody tr:last-child td{border-bottom:none;}
   </div>
 
   <!-- KARTY (mobile) -->
+
+  <!-- KARTY (telefon) -->
   <div class="cards" id="view-cards"></div>
 
   <!-- STATISTIKY -->
@@ -703,8 +741,8 @@ function showToast(msg){
 // ============================================================
 // LOAD DATA — leads + crm_data merge, fb_spend
 // ============================================================
-async function loadAll(){
-  showSync('⏳ Načítám…', '#d97706');
+async function loadAll(silent){
+  if (silent !== true) showSync('⏳ Načítám…', '#d97706');
   try{
     const [leadsRes, crmRes, spendRes] = await Promise.all([
       fetch(SB+'/rest/v1/leads?select=*&order=created_at.desc', {headers:H}),
@@ -740,7 +778,7 @@ async function loadAll(){
       sd.forEach(s => fbSpend[s.campaign_name] = Number(s.spend) || 0);
     }
 
-    showSync('✅ Synchronizováno', '#16a34a');
+    showSync('✅ Synchronizováno ' + new Date().toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'}), '#16a34a');
   }catch(e){
     showSync('⚠️ Chyba načítání', '#ef4444');
     console.error(e);
@@ -781,6 +819,10 @@ function setChipFilter(chip){
   render();
 }
 
+function onSortSel(){
+  const [f,d] = document.getElementById('sortSel').value.split(':');
+  sortField = f; sortDir = d; render();
+}
 function setSort(field){
   if (sortField === field){ sortDir = (sortDir === 'asc') ? 'desc' : 'asc'; }
   else { sortField = field; sortDir = 'asc'; }
@@ -790,8 +832,34 @@ function setSort(field){
 // ============================================================
 // SAVE — saveToApi (PATCH crm_data, INSERT pokud neexistuje)
 // ============================================================
-async function saveToApi(lead, oldStav, passedOldNotes) {
+// Sloupce v crm_data podle polí v aplikaci
+const COLMAP = {followup:'followup', myNotes:'my_notes', prodej_castka:'prodej_castka', prodej_produkt:'prodej_produkt', prodej_note:'prodej_note'};
+function fullData(lead){
+  return {
+    stav: lead.stav, poz: lead.poz || getPoz(lead.stav) || null,
+    prodej_castka: lead.prodej_castka || null,
+    prodej_mena: lead.prodej_mena || 'Kč',
+    prodej_produkt: lead.prodej_produkt || null,
+    prodej_note: lead.prodej_note || null,
+    followup: lead.followup || null,
+    my_notes: lead.myNotes || null,
+    updated_at: new Date().toISOString()
+  };
+}
+// Jen změněná pole -> starší otevřená kopie na jiném zařízení nepřepíše novější změny ostatních polí
+function partialData(lead, keys){
+  const d = {updated_at: new Date().toISOString()};
+  keys.forEach(k => {
+    if (k === 'stav'){ d.stav = lead.stav; d.poz = lead.poz || getPoz(lead.stav) || null; }
+    else if (COLMAP[k]){ const v = lead[k]; d[COLMAP[k]] = (v === '' || v === undefined) ? null : v; }
+  });
+  return d;
+}
+
+let pendingSaves = 0;
+async function saveToApi(lead, oldStav, passedOldNotes, keys) {
   showSync('💾 Ukládám…', '#d97706');
+  pendingSaves++;
   try {
     const idx = leads.findIndex(l => l.email === lead.email);
     const oldNotes = passedOldNotes !== undefined
@@ -799,16 +867,7 @@ async function saveToApi(lead, oldStav, passedOldNotes) {
       : (idx >= 0 ? (leads[idx].myNotes || '') : '');
     if (idx >= 0) leads[idx] = {...leads[idx], ...lead};
 
-    const data = {
-      stav: lead.stav, poz: lead.poz || getPoz(lead.stav) || null,
-      prodej_castka: lead.prodej_castka || null,
-      prodej_mena: lead.prodej_mena || 'Kč',
-      prodej_produkt: lead.prodej_produkt || null,
-      prodej_note: lead.prodej_note || null,
-      followup: lead.followup || null,
-      my_notes: lead.myNotes || null,
-      updated_at: new Date().toISOString()
-    };
+    const data = keys ? partialData(lead, keys) : fullData(lead);
     const enc = encodeURIComponent(lead.email);
     const pr = await fetch(SB+'/rest/v1/crm_data?email=eq.'+enc, {
       method: 'PATCH',
@@ -818,11 +877,11 @@ async function saveToApi(lead, oldStav, passedOldNotes) {
     if (!pr.ok) throw new Error(await pr.text());
     const updated = await pr.json();
     if (!updated || updated.length === 0) {
-      // Row neexistuje — INSERT
+      // Řádek neexistuje — INSERT (vždy s kompletními daty)
       const ir = await fetch(SB+'/rest/v1/crm_data', {
         method: 'POST',
         headers: {...H, 'Prefer': 'return=minimal'},
-        body: JSON.stringify({email: lead.email, ...data})
+        body: JSON.stringify({email: lead.email, ...fullData(lead)})
       });
       if (!ir.ok) throw new Error(await ir.text());
     }
@@ -842,6 +901,7 @@ async function saveToApi(lead, oldStav, passedOldNotes) {
       await logActivity(lead, 'poznamka', {note: diff || newNotes});
     }
   } catch(e) { showSync('⚠️ '+e.message, '#d97706'); }
+  finally { pendingSaves--; }
 }
 
 // ============================================================
@@ -990,29 +1050,8 @@ function renderTable(){
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.email)}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.problem)||'<span class="muted">–</span>'}</td>
-      <td class="cell-kategorie">
-        <div class="pill" style="--c:${pozColor}" title="Klikni pro změnu">
-          <span class="pill-dot"></span>
-          <span class="pill-text">${POZ_LABEL[poz]}</span>
-          <span class="pill-chev">▾</span>
-          <select class="pill-native" onchange="inlineSetKategorie('${escAttr(l.email)}', this.value)">
-            <option value="otevreno" ${poz==='otevreno'?'selected':''}>otevřen</option>
-            <option value="uzavreno" ${poz==='uzavreno'?'selected':''}>uzavřen</option>
-            <option value="konec" ${poz==='konec'?'selected':''}>konec</option>
-            <option value="" ${poz===''?'selected':''}>bez stavu</option>
-          </select>
-        </div>
-      </td>
-      <td class="cell-fáze">
-        <div class="pill pill-faze" style="--c:${f.color}" title="Klikni pro změnu">
-          <span class="pill-text">${l.stav ? f.label : 'Vybrat fázi'}</span>
-          <span class="pill-chev">▾</span>
-          <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
-          <select class="pill-native" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
-            ${buildStageOptions(l.stav)}
-          </select>
-        </div>
-      </td>
+      <td class="cell-kategorie">${kategoriePill(l)}</td>
+      <td class="cell-fáze">${fazePill(l)}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${castka}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.prodej_produkt)||'<span class="muted">–</span>'}</td>
       <td class="cell-followup">${followupCell(l)}</td>
@@ -1035,7 +1074,7 @@ async function inlineSetFollowup(email, value){
   const lead = leads.find(l => l.email === email);
   if (!lead) return;
   lead.followup = value || '';
-  await saveToApi(lead, lead.stav, lead.myNotes || '');
+  await saveToApi(lead, lead.stav, lead.myNotes || '', ['followup']);
   render();
 }
 
@@ -1056,8 +1095,8 @@ async function inlineSetKategorie(email, poz){
   const oldStav = lead.stav;
   lead.stav = POZ_DEFAULT_STAV[poz];
   lead.poz = getPoz(lead.stav);
-  await saveToApi(lead, oldStav);
-  renderStatsBar(); renderTable();
+  await saveToApi(lead, oldStav, undefined, ['stav']);
+  render();
 }
 async function inlineSetStav(email, stav){
   const lead = leads.find(l => l.email === email);
@@ -1065,13 +1104,38 @@ async function inlineSetStav(email, stav){
   const oldStav = lead.stav;
   lead.stav = stav;
   lead.poz = getPoz(stav);
-  await saveToApi(lead, oldStav);
-  renderStatsBar(); renderTable();
+  await saveToApi(lead, oldStav, undefined, ['stav']);
+  render();
 }
 
-// ============================================================
-// CARDS VIEW (mobile) — seřazeno od nejstaršího po nejnovější
-// ============================================================
+// ---------- Bubliny (používá tabulka na PC i karty na telefonu) ----------
+function kategoriePill(l){
+  const poz = getPoz(l.stav) || '';
+  return `<div class="pill" style="--c:${POZ_COLOR[poz]}" title="Klikni pro změnu">
+    <span class="pill-dot"></span>
+    <span class="pill-text">${POZ_LABEL[poz]}</span>
+    <span class="pill-chev">▾</span>
+    <select class="pill-native" onchange="inlineSetKategorie('${escAttr(l.email)}', this.value)">
+      <option value="otevreno" ${poz==='otevreno'?'selected':''}>otevřen</option>
+      <option value="uzavreno" ${poz==='uzavreno'?'selected':''}>uzavřen</option>
+      <option value="konec" ${poz==='konec'?'selected':''}>konec</option>
+      <option value="" ${poz===''?'selected':''}>bez stavu</option>
+    </select>
+  </div>`;
+}
+function fazePill(l){
+  const f = getFaze(l.stav);
+  return `<div class="pill pill-faze" style="--c:${f.color}" title="Klikni pro změnu">
+    <span class="pill-text">${l.stav ? f.label : 'Vybrat fázi'}</span>
+    <span class="pill-chev">▾</span>
+    <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
+    <select class="pill-native" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
+      ${buildStageOptions(l.stav)}
+    </select>
+  </div>`;
+}
+
+// ---------- Karty pro telefon (všechny údaje + úpravy přímo v kartě) ----------
 function renderCards(){
   const filtered = getFiltered();
   const wrap = document.getElementById('view-cards');
@@ -1079,22 +1143,30 @@ function renderCards(){
     wrap.innerHTML = `<div class="empty-state">Žádní leadi neodpovídají filtru.</div>`;
     return;
   }
-  const sorted = [...filtered].sort((a,b) =>
-    String(a.datum||a.created_at||'').localeCompare(String(b.datum||b.created_at||''), 'cs'));
-  wrap.innerHTML = sorted.map(l => {
-    const f = getFaze(l.stav);
-    return `<div class="lead-card" onclick="openLeadPanel('${escAttr(l.email)}')">
-      <div class="top-row">
-        <div>
-          <div class="name">${esc(l.jmeno)||esc(l.email)}</div>
-          <div class="firma">${esc(l.firma)||''}</div>
-        </div>
-        <span class="badge" style="background:${f.color}22;color:${f.color}">${f.label}</span>
+  wrap.innerHTML = filtered.map(l => {
+    const em = escAttr(l.email);
+    const open = `onclick="openLeadPanel('${em}')"`;
+    const plat = platformShort(l.platform);
+    const platColor = PLATFORM_COLOR[(l.platform||'FB').toUpperCase()] || '#1877F2';
+    const tel = l.telefon ? `<a href="tel:${escAttr(String(l.telefon).replace(/\s/g,''))}">📞 ${esc(l.telefon)}</a>` : '';
+    const sale = (l.prodej_castka || l.prodej_produkt)
+      ? `<div class="mcard-sale" ${open}>💰 <b>${l.prodej_castka ? Number(l.prodej_castka).toLocaleString('cs-CZ')+' €' : '–'}</b>${l.prodej_produkt ? ' · '+esc(l.prodej_produkt) : ''}</div>` : '';
+    const note = l.myNotes ? `<div class="mcard-note" ${open}>📝 ${esc(l.myNotes)}</div>` : '';
+    const camp = l.campaign_name ? `<div class="mcard-camp" ${open}><span class="platform-badge" style="background:${platColor}">${plat}</span> ${esc(l.campaign_name)}${l.ad_name ? ' · '+esc(l.ad_name) : ''}</div>` : '';
+    return `<div class="mcard">
+      <div class="mcard-top" ${open}>
+        <div class="mcard-name">${esc(l.jmeno)||esc(l.email)}</div>
+        <div class="mcard-date">${fmtDate(l.datum || l.created_at)}</div>
       </div>
-      <div class="meta">
-        <span>📞 ${esc(l.telefon)||'–'}</span>
-        <span>📅 ${fmtDate(l.datum || l.created_at)}</span>
+      <div class="mcard-contact">${tel}<a href="mailto:${em}">✉️ ${esc(l.email)}</a></div>
+      <div class="mcard-grid" ${open}>
+        <div><div class="mlbl">Jak kontaktovat</div><div class="mval">${esc(l.sluzba)||'–'}</div></div>
+        <div><div class="mlbl">Kdy začít</div><div class="mval">${esc(l.problem)||'–'}</div></div>
       </div>
+      <div class="mcard-pills">${kategoriePill(l)}${fazePill(l)}</div>
+      <div class="mcard-fu"><span class="mlbl">Follow-up</span>${followupCell(l)}</div>
+      ${sale}${note}${camp}
+      <button type="button" class="mcard-more" ${open}>Detail a úpravy ›</button>
     </div>`;
   }).join('');
 }
@@ -1235,8 +1307,8 @@ function panelValues(){
 function flushPanel() {
   if (!currentLead) return;
   const v = panelValues();
-  const changed = PANEL_KEYS.some(k => String(currentLead[k] ?? '') !== String(v[k] ?? ''));
-  if (!changed) return;
+  const changedKeys = PANEL_KEYS.filter(k => String(currentLead[k] ?? '') !== String(v[k] ?? ''));
+  if (!changedKeys.length) return;
 
   const oldStav  = currentLead.stav;
   const oldNotes = currentLead.myNotes || ''; // ← MUSÍ BÝT PŘED přepsáním!
@@ -1244,7 +1316,8 @@ function flushPanel() {
   PANEL_KEYS.forEach(k => currentLead[k] = v[k]);
   currentLead.poz = getPoz(currentLead.stav); // poz se odvozuje ze stav
 
-  saveToApi(currentLead, oldStav, oldNotes);
+  const crmKeys = changedKeys.filter(k => k !== 'campaign_name');
+  if (crmKeys.length) saveToApi(currentLead, oldStav, oldNotes, crmKeys);
   if (currentLead.campaign_name !== oldCampaign) updateLeadCampaign(currentLead.email, currentLead.campaign_name);
   render();
 }
@@ -1541,6 +1614,7 @@ function toPragueDate(v){
 async function syncFromSheet(silent){
   if (silent !== true) showSync('⏳ Stahuji ze Sheetu…', '#d97706');
   try{
+    lastSheetSync = Date.now();
     const res = await fetch(GSHEET_URL);
     if (!res.ok) throw new Error('Nepodařilo se stáhnout Google Sheet');
     const text = await res.text();
@@ -1570,15 +1644,19 @@ async function syncFromSheet(silent){
       });
     }
     const bodies = [...batch.values()];
-    let inserted = 0, updated = 0;
-    if (bodies.length){
+    // Nové leady: všechna pole ze Sheetu. Existující: bez kampaně/reklamy/platformy,
+    // ať import nepřepíše ručně zadanou kampaň (změněné jméno/telefon/odpovědi se aktualizují).
+    const newOnes = bodies.filter(b => !known.has(b.email));
+    const oldOnes = bodies.filter(b => known.has(b.email)).map(({campaign_name, ad_name, platform, ...rest}) => rest);
+    let inserted = newOnes.length, updated = oldOnes.length;
+    for (const part of [newOnes, oldOnes]){
+      if (!part.length) continue;
       const r2 = await fetch(SB+'/rest/v1/leads?on_conflict=email', {
         method:'POST',
         headers:{...H,'Prefer':'resolution=merge-duplicates,return=minimal'},
-        body: JSON.stringify(bodies)
+        body: JSON.stringify(part)
       });
       if (!r2.ok) throw new Error(await r2.text());
-      bodies.forEach(b => known.has(b.email) ? updated++ : inserted++);
     }
     showSync('✅ Synchronizováno', '#16a34a');
     if (silent !== true || inserted > 0) showToast(`Leady: ${inserted} nových, ${updated} aktualizováno${skipped?`, ${skipped} přeskočeno`:''}`);
@@ -1609,9 +1687,34 @@ function attemptLogin(e){
   return false;
 }
 
+// ============================================================
+// SYNCHRONIZACE MEZI ZAŘÍZENÍMI (PC ↔ telefon)
+// Data jsou v jedné databázi; otevřená stránka se sama obnovuje
+// ============================================================
+let lastInteraction = 0, lastSheetSync = 0, refreshBusy = false, syncLoopStarted = false;
+async function silentRefresh(){
+  if (refreshBusy || pendingSaves > 0 || document.hidden) return;
+  if (document.getElementById('leadPanel').classList.contains('open')) return;   // právě upravuješ detail
+  if (Date.now() - lastInteraction < (window.__IDLE_MS || 12000)) return;                              // právě něco děláš
+  refreshBusy = true;
+  try { await loadAll(true); } finally { refreshBusy = false; }
+}
+function onReturnToApp(){
+  silentRefresh().then(() => { if (Date.now() - lastSheetSync > 180000) syncFromSheet(true); });
+}
+function startSyncLoop(){
+  if (syncLoopStarted) return;
+  syncLoopStarted = true;
+  ['pointerdown','keydown','change','input'].forEach(ev => document.addEventListener(ev, () => { lastInteraction = Date.now(); }, true));
+  setInterval(silentRefresh, window.__SYNC_MS || 30000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) onReturnToApp(); });
+  window.addEventListener('focus', onReturnToApp);
+}
+
 function startApp(){
   setTab('table');
   // při otevření CRM se nejdřív načte databáze a pak se automaticky doplní nové leady ze Sheetu
+  startSyncLoop();
   loadAll().then(() => syncFromSheet(true));
 }
 
