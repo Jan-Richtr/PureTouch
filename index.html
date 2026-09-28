@@ -236,6 +236,17 @@ tbody tr:last-child td{border-bottom:none;}
 .panel-actions{display:flex;gap:8px;margin-top:18px;}
 
 
+
+/* ===== Follow-up v tabulce ===== */
+.date-pill{display:inline-flex;align-items:center;gap:2px;border:1px dashed var(--border);background:var(--bg3);border-radius:999px;padding:3px 6px 3px 8px;transition:border-color .15s, box-shadow .15s;}
+.date-pill:hover{border-color:var(--accent);}
+.date-pill.has{border-style:solid;border-color:color-mix(in srgb, var(--accent) 45%, #fff);background:#fff;}
+.date-pill.over{border-color:var(--red);background:color-mix(in srgb, var(--red) 9%, #fff);color:var(--red);}
+.date-pill input[type="date"]{border:none;background:transparent;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:inherit;padding:2px 0;width:118px;outline:none;cursor:pointer;}
+.date-pill:not(.has) input[type="date"]{color:var(--text-dim);font-weight:500;}
+.date-clear{border:none;background:transparent;color:var(--text-dim);font-size:15px;line-height:1;cursor:pointer;padding:0 3px;border-radius:50%;}
+.date-clear:hover{color:var(--red);}
+
 /* ===== Klikací "bublinky" (skutečný select je průhledný přes celou bublinu) ===== */
 .pill{
   position:relative;display:inline-flex;flex-wrap:nowrap;align-items:center;gap:6px;
@@ -700,8 +711,10 @@ async function loadAll(){
       fetch(SB+'/rest/v1/crm_data?select=*', {headers:H}),
       fetch(SB+'/rest/v1/fb_spend?select=*', {headers:H}).catch(()=>null)
     ]);
-    const leadsData = leadsRes.ok ? await leadsRes.json() : [];
-    const crmData   = crmRes.ok ? await crmRes.json() : [];
+    if (!leadsRes.ok) throw new Error('Načtení leadů selhalo (' + leadsRes.status + ')');
+    if (!crmRes.ok)   throw new Error('Načtení dat CRM selhalo (' + crmRes.status + ')');
+    const leadsData = await leadsRes.json();
+    const crmData   = await crmRes.json();
     const crmMap = {};
     crmData.forEach(c => crmMap[c.email] = c);
 
@@ -1002,11 +1015,28 @@ function renderTable(){
       </td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${castka}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.prodej_produkt)||'<span class="muted">–</span>'}</td>
-      <td onclick="openLeadPanel('${escAttr(l.email)}')" class="muted">${l.followup ? fmtDate(l.followup) : '–'}</td>
+      <td class="cell-followup">${followupCell(l)}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')" class="muted">${esc(note)||'–'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${l.campaign_name ? `<span class="mini-tag"><span class="platform-badge" style="background:${platColor};padding:1px 4px;font-size:9px;">${plat}</span> ${esc(l.campaign_name)}</span>` : '<span class="muted">–</span>'}</td>
     </tr>`;
   }).join('');
+}
+
+// Follow-up přímo v tabulce (viditelný a přepisovatelný)
+function todayPrague(){ return new Date().toLocaleDateString('sv-SE', {timeZone:'Europe/Prague'}); }
+function followupCell(l){
+  const over = l.followup && l.followup < todayPrague() && !['uzavreno','konec'].includes(getPoz(l.stav));
+  return `<div class="date-pill ${l.followup?'has':''} ${over?'over':''}" title="${over?'Follow-up po termínu – ':''}klikni pro změnu">
+    <input type="date" value="${escAttr(l.followup||'')}" onchange="inlineSetFollowup('${escAttr(l.email)}', this.value)">
+    ${l.followup ? `<button type="button" class="date-clear" title="Smazat follow-up" onclick="inlineSetFollowup('${escAttr(l.email)}','')">×</button>` : ''}
+  </div>`;
+}
+async function inlineSetFollowup(email, value){
+  const lead = leads.find(l => l.email === email);
+  if (!lead) return;
+  lead.followup = value || '';
+  await saveToApi(lead, lead.stav, lead.myNotes || '');
+  render();
 }
 
 // Inline úpravy přímo v tabulce (bez otevření panelu)
@@ -1071,11 +1101,11 @@ function renderCards(){
 
 function fmtDate(d){
   if (!d) return '–';
-  try{
-    const dt = new Date(d);
-    if (isNaN(dt)) return esc(String(d));
-    return dt.toLocaleDateString('cs-CZ');
-  }catch(e){ return esc(String(d)); }
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d));
+  if (m) return `${+m[3]}. ${+m[2]}. ${m[1]}`;               // čisté datum bez posunu časových pásem
+  const dt = new Date(d);
+  if (isNaN(dt)) return esc(String(d));
+  return dt.toLocaleDateString('cs-CZ', {timeZone:'Europe/Prague'});
 }
 function esc(s){ return (s===undefined||s===null) ? '' : String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escAttr(s){ return esc(s).replace(/'/g, '&#39;'); }
@@ -1156,6 +1186,7 @@ function openMailClient(){
 
 function closePanel(e){
   if (e && e.target !== e.currentTarget) return;
+  flushPanel();   // klik mimo panel / ✕ nikdy neztratí zadané změny
   document.getElementById('panelOverlay').classList.remove('open');
   document.getElementById('leadPanel').classList.remove('open');
   currentLead = null;
@@ -1187,29 +1218,37 @@ async function createLead(l){
   }catch(e){ showSync('⚠️ '+e.message, '#ef4444'); }
 }
 
-// savePanel — zachytit oldNotes PŘED mutací (kritická oprava)
-function savePanel() {
+// Uloží změny z panelu (jen pokud se něco změnilo). Volá se při změně pole, zavření panelu i tlačítku.
+// oldNotes se zachytává PŘED mutací (kritická oprava - diff poznámek do activity_log)
+const PANEL_KEYS = ['stav','followup','myNotes','prodej_castka','prodej_produkt','prodej_note','campaign_name'];
+function panelValues(){
+  return {
+    stav:           document.getElementById('pStage').value,
+    followup:       document.getElementById('pFollowup').value,
+    myNotes:        document.getElementById('pNotes').value,
+    prodej_castka:  document.getElementById('pCastka').value,
+    prodej_produkt: document.getElementById('pProdukt').value,
+    prodej_note:    document.getElementById('pProdejNote').value,
+    campaign_name:  document.getElementById('pKampan').value,
+  };
+}
+function flushPanel() {
   if (!currentLead) return;
+  const v = panelValues();
+  const changed = PANEL_KEYS.some(k => String(currentLead[k] ?? '') !== String(v[k] ?? ''));
+  if (!changed) return;
+
   const oldStav  = currentLead.stav;
   const oldNotes = currentLead.myNotes || ''; // ← MUSÍ BÝT PŘED přepsáním!
   const oldCampaign = currentLead.campaign_name || '';
-
-  currentLead.stav           = document.getElementById('pStage').value;
-  currentLead.followup       = document.getElementById('pFollowup').value;
-  currentLead.myNotes        = document.getElementById('pNotes').value;
-  currentLead.prodej_castka  = document.getElementById('pCastka').value;
-  currentLead.prodej_produkt = document.getElementById('pProdukt').value;
-  currentLead.prodej_note    = document.getElementById('pProdejNote').value;
-  currentLead.campaign_name  = document.getElementById('pKampan').value;
-  currentLead.poz            = getPoz(currentLead.stav); // poz se odvozuje ze stav
+  PANEL_KEYS.forEach(k => currentLead[k] = v[k]);
+  currentLead.poz = getPoz(currentLead.stav); // poz se odvozuje ze stav
 
   saveToApi(currentLead, oldStav, oldNotes);
   if (currentLead.campaign_name !== oldCampaign) updateLeadCampaign(currentLead.email, currentLead.campaign_name);
-
-  renderStatsBar();
-  if (currentTab === 'table') { if (isMobile()) renderCards(); else renderTable(); }
-  closePanel();
+  render();
 }
+function savePanel() { flushPanel(); closePanel(); }
 
 // campaign_name žije v tabulce leads, ne crm_data — samostatný PATCH
 async function updateLeadCampaign(email, campaign_name){
@@ -1579,8 +1618,9 @@ function startApp(){
 // ============================================================
 // INIT
 // ============================================================
-window.addEventListener('resize', () => render());
+window.addEventListener('resize', () => { if (localStorage.getItem('pt_auth') === 'ok') setTab(currentTab); });   // přepne tabulku ↔ karty při změně šířky
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('leadPanel').addEventListener('change', flushPanel);   // ukládání hned po změně pole
   if (localStorage.getItem('pt_auth') === 'ok'){
     document.getElementById('loginOverlay').style.display = 'none';
     startApp();
