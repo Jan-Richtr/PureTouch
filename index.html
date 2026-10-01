@@ -526,6 +526,7 @@ tbody tr:last-child td{border-bottom:none;}
           <th data-sort="jmeno">Jméno <span class="sort-arrow">▲</span></th>
           <th>Telefon</th>
           <th>Email</th>
+          <th>Zájem o</th>
           <th>Jak kontaktovat</th>
           <th>Kdy začít</th>
           <th>Poznámka</th>
@@ -597,6 +598,11 @@ tbody tr:last-child td{border-bottom:none;}
     <div class="two-col">
       <div class="info-box"><div class="ibl">Email</div><div class="ibv link" id="pInfoEmail">—</div></div>
       <div class="info-box"><div class="ibl">Telefon</div><div class="ibv" id="pInfoTel">—</div></div>
+    </div>
+
+    <div class="info-box" style="margin-bottom:14px;">
+      <div class="ibl">Zájem o</div>
+      <div class="ibv" id="pInfoZajem">—</div>
     </div>
 
     <div class="info-box" style="margin-bottom:14px;">
@@ -1031,7 +1037,7 @@ function renderTable(){
   });
 
   if (!filtered.length){
-    tbody.innerHTML = `<tr><td colspan="13"><div class="empty-state">Žádní leadi neodpovídají filtru.</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="14"><div class="empty-state">Žádní leadi neodpovídají filtru.</div></td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map(l => {
@@ -1048,6 +1054,7 @@ function renderTable(){
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.jmeno)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.telefon)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.email)}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.zajem_o)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.problem)||'<span class="muted">–</span>'}</td>
       <td class="cell-kategorie">${kategoriePill(l)}</td>
@@ -1160,6 +1167,7 @@ function renderCards(){
       </div>
       <div class="mcard-contact">${tel}<a href="mailto:${em}">✉️ ${esc(l.email)}</a></div>
       <div class="mcard-grid" ${open}>
+        <div style="grid-column:1/-1"><div class="mlbl">Zájem o</div><div class="mval">${esc(l.zajem_o)||'–'}</div></div>
         <div><div class="mlbl">Jak kontaktovat</div><div class="mval">${esc(l.sluzba)||'–'}</div></div>
         <div><div class="mlbl">Kdy začít</div><div class="mval">${esc(l.problem)||'–'}</div></div>
       </div>
@@ -1199,6 +1207,7 @@ function openLeadPanel(email){
   document.getElementById('pInfoEmail').textContent = lead.email || '—';
   document.getElementById('pInfoTel').textContent = lead.telefon || 'neuvedeno';
   document.getElementById('pInfoProblem').textContent = lead.problem || 'neuvedeno';
+  document.getElementById('pInfoZajem').textContent = lead.zajem_o || 'neuvedeno';
   document.getElementById('pInfoLokalita').textContent = lead.sluzba || 'neuvedeno';
   document.getElementById('pInfoDatum').textContent = fmtDate(lead.datum || lead.created_at);
 
@@ -1593,6 +1602,7 @@ function mapHeader(h){
   if (n === 'form_name') return 'form_name';
   if (n.startsWith('jak_vas_mame')) return 'kontakt';   // Jak vás máme nejlépe kontaktovat?
   if (n.startsWith('kdy_byste')) return 'zacit';       // Kdy byste chtěl/a začít?
+  if (n.startsWith('mam_zajem')) return 'zajem';       // Mám zájem o: (Maderoterapii / Kosmetickou péči)
   return n;
 }
 
@@ -1603,6 +1613,9 @@ function cleanChoice(v){
   if (low === 'whatsapp') return 'WhatsApp';
   if (low === 'sms') return 'SMS';
   return t.charAt(0).toUpperCase() + t.slice(1);
+}
+function cleanMulti(v){
+  return (v||'').split(/[|,]/).map(cleanChoice).filter(Boolean).join(', ');
 }
 function cleanPhone(v){ return (v||'').replace(/^p:/i,'').trim(); }
 function toPragueDate(v){
@@ -1638,6 +1651,7 @@ async function syncFromSheet(silent){
         zdroj: obj.form_name || 'Meta formulář',
         sluzba: cleanChoice(obj.kontakt),     // sloupec "Jak kontaktovat"
         problem: cleanChoice(obj.zacit),      // sloupec "Kdy začít"
+        zajem_o: cleanMulti(obj.zajem),       // sloupec "Mám zájem o"
         campaign_name: obj.campaign_name || '',
         ad_name: obj.ad_name || '',
         platform: (obj.platform || '').toUpperCase()
