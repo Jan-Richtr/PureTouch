@@ -499,6 +499,9 @@ tbody tr:last-child td{border-bottom:none;}
   <select id="filterService" onchange="onFilterChange()">
     <option value="">Vše – kontakt</option>
   </select>
+  <select id="filterZajem" onchange="onFilterChange()">
+    <option value="">Vše – zájem</option>
+  </select>
   <select id="sortSel" class="only-mobile" onchange="onSortSel()">
     <option value="datum:desc">Řadit: nejnovější</option>
     <option value="datum:asc">Řadit: nejstarší</option>
@@ -526,9 +529,9 @@ tbody tr:last-child td{border-bottom:none;}
           <th data-sort="jmeno">Jméno <span class="sort-arrow">▲</span></th>
           <th>Telefon</th>
           <th>Email</th>
-          <th>Zájem o</th>
           <th>Jak kontaktovat</th>
           <th>Kdy začít</th>
+          <th>Zájem o</th>
           <th>Poznámka</th>
           <th data-sort="stav">Fáze <span class="sort-arrow">▲</span></th>
           <th>€</th>
@@ -670,7 +673,13 @@ const SB = 'https://gcrpcrlcaqfbxtjizysb.supabase.co';
 const SK = 'sb_publishable_H9DvsObN_UNX5eBXEBza-Q_mEdetygN';
 const H  = {'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json'};
 
-const GSHEET_URL = 'https://docs.google.com/spreadsheets/d/10exnWTLmSPesrHW2Z58aBTvSyBDcCQ4srEr9FvmiHSw/export?format=csv&gid=0';
+// Google Sheet s leady z Meta formulářů. Každý list (záložka) má své gid – další list přidáš sem.
+const GSHEET_ID = '10exnWTLmSPesrHW2Z58aBTvSyBDcCQ4srEr9FvmiHSw';
+const GSHEET_TABS = [
+  {gid:'0',         name:'List 1'},
+  {gid:'369433000', name:'List 2'}
+];
+const gsheetUrl = gid => `https://docs.google.com/spreadsheets/d/${GSHEET_ID}/export?format=csv&gid=${gid}`;
 
 // ---------- FAZE MODEL ----------
 const FAZE = [
@@ -717,6 +726,7 @@ let currentLead = null;
 let searchTerm = '';
 let filterStage = '';
 let filterService = '';
+let filterZajem = '';
 let filterProdej = '';
 let filterChip = '';      // '', 'otevreno', 'uzavreno', 'konec', 'bez', 'followup'
 let sortField = 'datum';
@@ -741,7 +751,7 @@ function showToast(msg){
   t.className = 'toast';
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2600);
+  setTimeout(() => t.remove(), Math.max(2600, Math.min(9000, msg.length * 55)));
 }
 
 // ============================================================
@@ -811,11 +821,20 @@ function populateFilters(){
       services.map(s => `<option value="${escAttr(s)}">${esc(s)}</option>`).join('');
     svcSel.value = cur;
   }
+  const zSel = document.getElementById('filterZajem');
+  if (zSel){
+    const cur = zSel.value;
+    const zs = [...new Set(leads.map(l=>l.zajem).filter(Boolean))].sort();
+    zSel.innerHTML = '<option value="">Vše – zájem</option>' +
+      zs.map(s => `<option value="${escAttr(s)}">${esc(s)}</option>`).join('');
+    zSel.value = cur;
+  }
 }
 
 function onFilterChange(){
   filterStage = document.getElementById('filterStage').value;
   filterService = document.getElementById('filterService').value;
+  filterZajem = document.getElementById('filterZajem').value;
   filterProdej = document.getElementById('filterProdej').value;
   render();
 }
@@ -968,6 +987,7 @@ function getFiltered(){
   }
   if (filterStage) out = out.filter(l => l.stav === filterStage);
   if (filterService) out = out.filter(l => l.sluzba === filterService);
+  if (filterZajem) out = out.filter(l => l.zajem === filterZajem);
   if (filterProdej === 'ano') out = out.filter(l => Number(l.prodej_castka) > 0);
   if (filterProdej === 'ne') out = out.filter(l => !(Number(l.prodej_castka) > 0));
 
@@ -1054,9 +1074,9 @@ function renderTable(){
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.jmeno)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.telefon)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.email)}</td>
-      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.zajem_o)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.problem)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.zajem)||'<span class="muted">–</span>'}</td>
       <td class="cell-kategorie">${kategoriePill(l)}</td>
       <td class="cell-fáze">${fazePill(l)}</td>
       <td onclick="openLeadPanel('${escAttr(l.email)}')">${castka}</td>
@@ -1167,7 +1187,7 @@ function renderCards(){
       </div>
       <div class="mcard-contact">${tel}<a href="mailto:${em}">✉️ ${esc(l.email)}</a></div>
       <div class="mcard-grid" ${open}>
-        <div style="grid-column:1/-1"><div class="mlbl">Zájem o</div><div class="mval">${esc(l.zajem_o)||'–'}</div></div>
+        ${l.zajem ? `<div style="grid-column:1/-1"><div class="mlbl">Zájem o</div><div class="mval">${esc(l.zajem)}</div></div>` : ''}
         <div><div class="mlbl">Jak kontaktovat</div><div class="mval">${esc(l.sluzba)||'–'}</div></div>
         <div><div class="mlbl">Kdy začít</div><div class="mval">${esc(l.problem)||'–'}</div></div>
       </div>
@@ -1207,7 +1227,7 @@ function openLeadPanel(email){
   document.getElementById('pInfoEmail').textContent = lead.email || '—';
   document.getElementById('pInfoTel').textContent = lead.telefon || 'neuvedeno';
   document.getElementById('pInfoProblem').textContent = lead.problem || 'neuvedeno';
-  document.getElementById('pInfoZajem').textContent = lead.zajem_o || 'neuvedeno';
+  document.getElementById('pInfoZajem').textContent = lead.zajem || 'neuvedeno';
   document.getElementById('pInfoLokalita').textContent = lead.sluzba || 'neuvedeno';
   document.getElementById('pInfoDatum').textContent = fmtDate(lead.datum || lead.created_at);
 
@@ -1602,7 +1622,7 @@ function mapHeader(h){
   if (n === 'form_name') return 'form_name';
   if (n.startsWith('jak_vas_mame')) return 'kontakt';   // Jak vás máme nejlépe kontaktovat?
   if (n.startsWith('kdy_byste')) return 'zacit';       // Kdy byste chtěl/a začít?
-  if (n.startsWith('mam_zajem')) return 'zajem';       // Mám zájem o: (Maderoterapii / Kosmetickou péči)
+  if (n.startsWith('mam_zajem')) return 'zajem';       // Mám zájem o:
   return n;
 }
 
@@ -1614,8 +1634,10 @@ function cleanChoice(v){
   if (low === 'sms') return 'SMS';
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
-function cleanMulti(v){
-  return (v||'').split(/[|,]/).map(cleanChoice).filter(Boolean).join(', ');
+const INTEREST_NAMES = {'kosmetickou péči':'Kosmetická péče', 'maderoterapii':'Maderoterapie'};
+function cleanInterest(v){
+  const t = cleanChoice(v);
+  return INTEREST_NAMES[t.toLowerCase()] || t;
 }
 function cleanPhone(v){ return (v||'').replace(/^p:/i,'').trim(); }
 function toPragueDate(v){
@@ -1624,26 +1646,40 @@ function toPragueDate(v){
   return d.toLocaleDateString('sv-SE', {timeZone:'Europe/Prague'}); // YYYY-MM-DD
 }
 
+async function fetchTab(tab){
+  const res = await fetch(gsheetUrl(tab.gid));
+  if (!res.ok) throw new Error(tab.name + ': nelze stáhnout (' + res.status + ')');
+  const rows = parseCSV(await res.text());
+  if (!rows.length) return [];
+  const headers = rows[0].map(mapHeader);
+  if (!headers.includes('email')) throw new Error(tab.name + ': chybí sloupec e-mail');
+  return rows.slice(1).map(r => {
+    const obj = {_tab: tab.name};
+    headers.forEach((h,i) => obj[h] = (r[i]||'').trim());
+    return obj;
+  });
+}
+
 async function syncFromSheet(silent){
   if (silent !== true) showSync('⏳ Stahuji ze Sheetu…', '#d97706');
   try{
     lastSheetSync = Date.now();
-    const res = await fetch(GSHEET_URL);
-    if (!res.ok) throw new Error('Nepodařilo se stáhnout Google Sheet');
-    const text = await res.text();
-    const rows = parseCSV(text);
-    if (rows.length < 2) { if (silent !== true) showToast('Sheet zatím neobsahuje žádné leady'); showSync('✅ Synchronizováno','#16a34a'); return; }
+    // všechny listy se stahují zároveň; chyba jednoho listu neshodí ostatní
+    const settled = await Promise.allSettled(GSHEET_TABS.map(fetchTab));
+    const problems = settled.filter(x => x.status === 'rejected').map(x => x.reason.message);
+    if (problems.length === GSHEET_TABS.length) throw new Error(problems[0]);
+    const all = settled.filter(x => x.status === 'fulfilled').flatMap(x => x.value);
 
-    const headers = rows[0].map(mapHeader);
+    // nejstarší první -> při stejném e-mailu na více listech vyhraje nejnovější záznam
+    all.sort((a,b) => (Date.parse(a.datum)||0) - (Date.parse(b.datum)||0));
+
     const known = new Set(leads.map(l => l.email));
-    const batch = new Map();   // email -> body (duplicity ve Sheetu se sloučí)
+    const batch = new Map();   // email -> body (duplicity se sloučí)
     let skipped = 0;
-    for (const r of rows.slice(1)){
-      const obj = {};
-      headers.forEach((h,i) => obj[h] = (r[i]||'').trim());
+    for (const obj of all){
       const email = (obj.email||'').toLowerCase();
       if (!email){ skipped++; continue; }
-      batch.set(email, {
+      const body = {
         email,
         jmeno: obj.jmeno || '',
         telefon: cleanPhone(obj.telefon),
@@ -1651,30 +1687,58 @@ async function syncFromSheet(silent){
         zdroj: obj.form_name || 'Meta formulář',
         sluzba: cleanChoice(obj.kontakt),     // sloupec "Jak kontaktovat"
         problem: cleanChoice(obj.zacit),      // sloupec "Kdy začít"
-        zajem_o: cleanMulti(obj.zajem),       // sloupec "Mám zájem o"
         campaign_name: obj.campaign_name || '',
         ad_name: obj.ad_name || '',
         platform: (obj.platform || '').toUpperCase()
-      });
+      };
+      const z = cleanInterest(obj.zajem);     // sloupec "Zájem o" (jen novější formulář)
+      if (z) body.zajem = z;
+      batch.set(email, body);
     }
     const bodies = [...batch.values()];
     // Nové leady: všechna pole ze Sheetu. Existující: bez kampaně/reklamy/platformy,
     // ať import nepřepíše ručně zadanou kampaň (změněné jméno/telefon/odpovědi se aktualizují).
     const newOnes = bodies.filter(b => !known.has(b.email));
     const oldOnes = bodies.filter(b => known.has(b.email)).map(({campaign_name, ad_name, platform, ...rest}) => rest);
-    let inserted = newOnes.length, updated = oldOnes.length;
-    for (const part of [newOnes, oldOnes]){
-      if (!part.length) continue;
-      const r2 = await fetch(SB+'/rest/v1/leads?on_conflict=email', {
-        method:'POST',
-        headers:{...H,'Prefer':'resolution=merge-duplicates,return=minimal'},
-        body: JSON.stringify(part)
-      });
-      if (!r2.ok) throw new Error(await r2.text());
+    const inserted = newOnes.length, updated = oldOnes.length;
+
+    // Dávky se stejnou sadou polí posíláme zvlášť, aby chybějící pole nepřepsalo hodnotu prázdnem
+    const groups = new Map();
+    [...newOnes, ...oldOnes].forEach(b => {
+      const key = Object.keys(b).sort().join(',');
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(b);
+    });
+    const post = part => fetch(SB+'/rest/v1/leads?on_conflict=email', {
+      method:'POST',
+      headers:{...H,'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body: JSON.stringify(part)
+    });
+    let missingZajem = false;
+    for (const part of groups.values()){
+      let r2 = await post(part);
+      if (!r2.ok){
+        const txt = await r2.text();
+        // v databázi ještě chybí sloupec "zajem" -> import nesmí spadnout, uloží se bez něj
+        if (/zajem/.test(txt) && part.some(b => 'zajem' in b)){
+          missingZajem = true;
+          r2 = await post(part.map(({zajem, ...rest}) => rest));
+          if (!r2.ok) throw new Error(await r2.text());
+        } else throw new Error(txt);
+      }
     }
-    showSync('✅ Synchronizováno', '#16a34a');
-    if (silent !== true || inserted > 0) showToast(`Leady: ${inserted} nových, ${updated} aktualizováno${skipped?`, ${skipped} přeskočeno`:''}`);
-    await loadAll();
+    const warn = [];
+    if (problems.length) warn.push('Pozor: ' + problems.join('; '));
+    if (missingZajem) warn.push('V databázi chybí sloupec „zajem“ – leady jsou bez „Zájem o“. Spusť v Supabase: ALTER TABLE leads ADD COLUMN IF NOT EXISTS zajem TEXT;');
+    if (warn.length){
+      showSync(missingZajem ? '⚠️ Chybí sloupec v databázi' : '⚠️ Část listů selhala', '#d97706');
+      showToast(warn.join('  '));
+    } else {
+      showSync('✅ Synchronizováno', '#16a34a');
+    }
+    if (silent !== true || inserted > 0) showToast(`Leady: ${inserted} nových, ${updated} aktualizováno${skipped?`, ${skipped} bez e-mailu přeskočeno`:''}`);
+    await loadAll(true);
+    if (warn.length) showSync(missingZajem ? '⚠️ Chybí sloupec v databázi' : '⚠️ Část listů selhala', '#d97706');
   }catch(e){
     showSync('⚠️ Chyba importu', '#ef4444');
     showToast('Chyba importu: ' + e.message);
