@@ -1696,10 +1696,14 @@ async function syncFromSheet(silent){
       batch.set(email, body);
     }
     const bodies = [...batch.values()];
-    // Nové leady: všechna pole ze Sheetu. Existující: bez kampaně/reklamy/platformy,
-    // ať import nepřepíše ručně zadanou kampaň (změněné jméno/telefon/odpovědi se aktualizují).
+    // Nové i existující leady: všechna pole ze Sheetu (přepíše se jméno, telefon, odpovědi, kampaň...).
     const newOnes = bodies.filter(b => !known.has(b.email));
-    const oldOnes = bodies.filter(b => known.has(b.email)).map(({campaign_name, ad_name, platform, ...rest}) => rest);
+    const oldOnes = bodies.filter(b => known.has(b.email)).map(b => {
+      // Existující lead se přepíše daty ze Sheetu; kampaň/reklama/platforma jen pokud je ve Sheetu vyplněná
+      const o = {...b};
+      ['campaign_name','ad_name','platform'].forEach(k => { if (!o[k]) delete o[k]; });
+      return o;
+    });
     const inserted = newOnes.length, updated = oldOnes.length;
 
     // Dávky se stejnou sadou polí posíláme zvlášť, aby chybějící pole nepřepsalo hodnotu prázdnem
