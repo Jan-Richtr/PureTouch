@@ -677,7 +677,8 @@ const H  = {'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application
 const GSHEET_ID = '10exnWTLmSPesrHW2Z58aBTvSyBDcCQ4srEr9FvmiHSw';
 const GSHEET_TABS = [
   {gid:'0',         name:'List 1'},
-  {gid:'369433000', name:'List 2'}
+  {gid:'369433000', name:'List 2'},
+  {gid:'136099104', name:'List 3'}
 ];
 const gsheetUrl = gid => `https://docs.google.com/spreadsheets/d/${GSHEET_ID}/export?format=csv&gid=${gid}`;
 
@@ -1678,7 +1679,7 @@ async function syncFromSheet(silent){
     let skipped = 0;
     for (const obj of all){
       const email = (obj.email||'').toLowerCase();
-      if (!email){ skipped++; continue; }
+      if (!email || email === 'test@meta.com' || /<test lead/i.test(obj.jmeno||'')){ skipped++; continue; }   // prázdné a testovací leady z Meta
       const body = {
         email,
         jmeno: obj.jmeno || '',
