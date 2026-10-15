@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PURE TOUCH CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fdfaf5;
+  --bg2:#ffffff;
+  --bg3:#f3ece5;
+  --border:#e6dcd0;
+  --accent:#8a7361;
+  --accent2:#5d4c3a;
+  --green:#7a9a7e;
+  --red:#c17a6a;
+  --yellow:#c99a52;
+  --text:#3d332a;
+  --text-dim:#8a7d72;
+  --text-dim2:#b7aca0;
+  --brand-taupe:#d0c9c1;
+  --radius:12px;
+  --shadow:0 2px 10px rgba(93,76,58,.08);
+  --font-display:'Cormorant Garamond', Georgia, serif;
+  --font-mono:'JetBrains Mono', 'SF Mono', monospace;
+}
+*{box-sizing:border-box;}
+html,body{
+  margin:0;padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+body{padding-bottom:70px;}
+a{color:var(--accent2);}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+
+/* ===== TOP BAR ===== */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(253,250,245,.9);box-shadow:var(--shadow);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.brand{font-family:var(--font-display);font-weight:600;font-size:20px;letter-spacing:2.5px;text-transform:uppercase;display:flex;align-items:center;gap:9px;white-space:nowrap;color:var(--accent2);}
+.brand .dot{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--accent2);background:transparent;flex-shrink:0;}
+.tabs{display:flex;gap:4px;flex:1;flex-wrap:wrap;}
+.tab{
+  background:transparent;border:1px solid transparent;color:var(--text-dim);
+  padding:8px 14px;border-radius:9px;font-size:13.5px;font-weight:600;
+  transition:.15s;
+}
+.tab:hover{color:var(--text);background:var(--bg3);}
+.tab.active{color:#fff;background:var(--accent);}
+.top-actions{display:flex;gap:8px;align-items:center;}
+.sync-badge{
+  font-size:12px;padding:5px 10px;border-radius:8px;background:var(--bg3);
+  color:var(--text-dim);white-space:nowrap;transition:.2s;
+}
+.btn{
+  background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;white-space:nowrap;
+}
+.btn:hover{border-color:var(--accent);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:7px;}
+.searchbox{
+  background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  padding:8px 12px;border-radius:9px;font-size:13px;min-width:160px;
+}
+.icon-btn{
+  width:34px;height:34px;border-radius:9px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text);font-size:15px;
+  display:flex;align-items:center;justify-content:center;
+}
+.icon-btn:hover{border-color:var(--accent);}
+.icon-btn.ic-blue{background:#1d4ed822;border-color:#3b82f655;}
+.icon-btn.ic-green{background:#16653422;border-color:#22c55e55;}
+.icon-btn.ic-dark{background:#1e293b;border-color:var(--border);}
+.icon-btn.ic-tan{background:#a1662822;border-color:#d9822855;}
+
+/* FILTER BAR */
+.filterbar{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  padding:10px 20px;border-bottom:1px solid var(--border);
+  background:rgba(243,236,229,.65);
+}
+.filterbar select{
+  background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  padding:7px 30px 7px 10px;border-radius:8px;font-size:12.5px;
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a7361' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 9px center;background-size:12px;
+  transition:border-color .15s;
+}
+.filterbar select:focus{outline:none;border-color:var(--accent);}
+@media (max-width:700px){
+  .filterbar{padding:8px 14px;}
+}
+
+/* ===== CONTAINER ===== */
+.container{max-width:1400px;margin:0 auto;padding:18px 20px 40px;}
+
+/* ===== STATS BAR ===== */
+.statsbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+.stat-chip{box-shadow:var(--shadow);
+  flex:1;min-width:110px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:.12s;
+  user-select:none;
+}
+.stat-chip:hover{border-color:var(--accent2);}
+.stat-chip.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+.stat-chip .num{font-size:24px;font-weight:800;font-family:var(--font-mono);}
+.stat-chip .lbl{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.stat-chip.tot .num{color:var(--accent2);}
+.stat-chip.ot .num{color:var(--yellow);}
+.stat-chip.uz .num{color:var(--green);}
+.stat-chip.ko .num{color:var(--red);}
+.stat-chip.no .num{color:var(--text-dim);}
+.stat-chip.fu .num{color:#f472b6;}
+
+/* ===== TABLE ===== */
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;overflow-y:hidden;box-shadow:var(--shadow);-webkit-overflow-scrolling:touch;}
+table{min-width:100%;border-collapse:collapse;font-size:13.5px;}
+thead th{
+  text-align:left;padding:11px 14px;background:var(--bg3);
+  color:var(--text-dim);font-weight:600;font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.4px;
+  border-bottom:1px solid var(--border);cursor:pointer;user-select:none;
+  white-space:nowrap;
+}
+thead th:hover{color:var(--text);}
+thead th .sort-arrow{opacity:.5;font-size:10px;margin-left:3px;}
+thead th.sorted .sort-arrow{opacity:1;color:var(--accent2);}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr{cursor:pointer;transition:.12s;}
+tbody tr:hover{background:var(--bg3);}
+tbody tr:last-child td{border-bottom:none;}
+.badge{
+  display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700;
+  white-space:nowrap;
+}
+.muted{color:var(--text-dim);}
+.empty-state{padding:60px 20px;text-align:center;color:var(--text-dim);}
+
+/* ===== CARDS (mobile) ===== */
+.cards{display:flex;flex-direction:column;gap:10px;}
+.lead-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;cursor:pointer;box-shadow:var(--shadow);
+}
+.lead-card .top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.lead-card .name{font-weight:700;font-size:15px;}
+.lead-card .firma{color:var(--text-dim);font-size:12.5px;margin-top:1px;}
+.lead-card .meta{display:flex;gap:10px;margin-top:8px;font-size:12px;color:var(--text-dim2);flex-wrap:wrap;}
+
+/* ===== BOTTOM NAV (mobile) ===== */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(10px);box-shadow:0 -2px 10px rgba(93,76,58,.08);
+  border-top:1px solid var(--border);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
+}
+.bn-row{display:flex;justify-content:space-around;}
+.bn-item{
+  background:none;border:none;color:var(--text-dim2);
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:10px;padding:6px 8px;border-radius:8px;flex:1;
+}
+.bn-item.active{color:var(--accent2);}
+.bn-item .ic{font-size:18px;}
+
+/* ===== PANEL (slide-in) ===== */
+.panel-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;
+}
+.panel-overlay.open{display:block;}
+.panel{
+  position:fixed;top:0;right:0;bottom:0;width:420px;max-width:100%;
+  background:var(--bg2);border-left:1px solid var(--border);z-index:61;
+  transform:translateX(100%);transition:transform .22s ease;
+  overflow-y:auto;padding:20px;box-shadow:-8px 0 30px rgba(120,90,80,.12);
+}
+.panel.open{transform:translateX(0);}
+.panel h3{margin:0 0 2px;font-size:22px;font-family:var(--font-display);font-weight:700;color:var(--accent2);}
+.panel .sub{color:var(--text-dim);font-size:13px;margin-bottom:18px;}
+/* ===== LOGIN ===== */
+.login-overlay{
+  position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.login-card{
+  width:100%;max-width:360px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:32px 28px;box-shadow:var(--shadow);text-align:center;
+}
+.login-card .login-logo{
+  font-family:var(--font-display);font-weight:600;font-size:24px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--accent2);margin-bottom:4px;
+}
+.login-card .login-sub{font-size:12.5px;color:var(--text-dim);margin-bottom:26px;}
+.login-card .field-full{text-align:left;}
+.login-card input{
+  width:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);
+  background:var(--bg3);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;outline:none;transition:border-color .15s, box-shadow .15s, background .15s;
+}
+.login-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(138,115,97,.16);background:#fff;}
+.login-card .btn-primary{width:100%;padding:11px;margin-top:6px;font-size:14px;}
+.login-error{color:var(--red);font-size:12.5px;margin:10px 0 0;min-height:16px;}
+
+.panel-close{
+  position:absolute;top:16px;right:16px;background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);width:30px;height:30px;border-radius:8px;font-size:15px;
+}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:5px;font-weight:600;}
+.field select,.field input,.field textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  padding:9px 11px;border-radius:8px;font-size:13.5px;
+}
+.field textarea{min-height:80px;resize:vertical;}
+.field-row{display:flex;gap:10px;}
+.field-row .field{flex:1;}
+.panel-info{
+  background:var(--bg3);border-radius:9px;padding:10px 12px;font-size:12.5px;
+  color:var(--text-dim);margin-bottom:16px;line-height:1.6;
+}
+.panel-actions{display:flex;gap:8px;margin-top:18px;}
+
+
+
+/* ===== Follow-up v tabulce ===== */
+.date-pill{display:inline-flex;align-items:center;gap:2px;border:1px dashed var(--border);background:var(--bg3);border-radius:999px;padding:3px 6px 3px 8px;transition:border-color .15s, box-shadow .15s;}
+.date-pill:hover{border-color:var(--accent);}
+.date-pill.has{border-style:solid;border-color:color-mix(in srgb, var(--accent) 45%, #fff);background:#fff;}
+.date-pill.over{border-color:var(--red);background:color-mix(in srgb, var(--red) 9%, #fff);color:var(--red);}
+.date-pill input[type="date"]{border:none;background:transparent;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:inherit;padding:2px 0;width:118px;outline:none;cursor:pointer;}
+.date-pill:not(.has) input[type="date"]{color:var(--text-dim);font-weight:500;}
+.date-clear{border:none;background:transparent;color:var(--text-dim);font-size:15px;line-height:1;cursor:pointer;padding:0 3px;border-radius:50%;}
+.date-clear:hover{color:var(--red);}
+
+
+/* Sloupec Jméno zůstává vidět při posunu tabulky do stran (hlavně na telefonu) */
+#tableHeadRow th:nth-child(2), #tableBody td:nth-child(2){
+  position:sticky;left:0;z-index:2;background:var(--bg2);box-shadow:1px 0 0 var(--border);
+}
+#tableHeadRow th:nth-child(2){background:var(--bg3);z-index:3;}
+#tableBody tr:hover td:nth-child(2){background:var(--bg3);}
+
+
+/* ===== Karty na telefonu ===== */
+.only-mobile{display:none;}
+.mcard{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+.mcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;cursor:pointer;}
+.mcard-name{font-size:17px;font-weight:700;line-height:1.25;}
+.mcard-date{font-size:12px;color:var(--text-dim);white-space:nowrap;padding-top:3px;}
+.mcard-contact{display:flex;flex-direction:column;gap:5px;margin-top:8px;font-size:14px;}
+.mcard-contact a{color:var(--accent2);text-decoration:none;font-weight:600;word-break:break-all;}
+.mcard-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding:10px 12px;background:var(--bg3);border-radius:10px;cursor:pointer;}
+.mlbl{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;}
+.mval{font-size:14px;font-weight:600;margin-top:2px;}
+.mcard-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:flex-start;}
+.mcard-fu{display:flex;align-items:center;gap:10px;margin-top:12px;}
+.mcard-sale,.mcard-note,.mcard-camp{margin-top:10px;font-size:13.5px;cursor:pointer;}
+.mcard-note{color:var(--text-dim);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.mcard-camp{color:var(--text-dim);font-size:12.5px;}
+.mcard-more{width:100%;margin-top:12px;padding:11px;border:1px solid var(--border);background:var(--bg3);color:var(--accent2);border-radius:10px;font-size:13.5px;font-weight:700;}
+.mcard-more:active{background:var(--border);}
+
+/* ===== Klikací "bublinky" (skutečný select je průhledný přes celou bublinu) ===== */
+.pill{
+  position:relative;display:inline-flex;flex-wrap:nowrap;align-items:center;gap:6px;
+  padding:6px 11px;border-radius:999px;cursor:pointer;
+  background:color-mix(in srgb, var(--c) 13%, #fff);
+  border:1px solid color-mix(in srgb, var(--c) 38%, #fff);
+  color:var(--c);font-size:12.5px;font-weight:700;white-space:nowrap;
+  transition:box-shadow .15s, border-color .15s, transform .05s;
+}
+.pill:hover{border-color:var(--c);box-shadow:0 2px 8px color-mix(in srgb, var(--c) 28%, transparent);}
+.pill:active{transform:scale(.98);}
+.pill-dot{width:8px;height:8px;border-radius:50%;background:var(--c);flex-shrink:0;}
+.pill-chev{font-size:11px;opacity:.75;margin-left:2px;}
+.pill-faze{display:inline-grid;grid-template-columns:auto auto;column-gap:6px;row-gap:1px;align-items:center;justify-content:start;padding:6px 12px;border-radius:14px;}
+.pill-faze .date-sub{grid-column:1 / -1;margin:0;font-size:10.5px;color:var(--text-dim);font-weight:500;}
+.pill-native{
+  position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;
+  font-size:16px;border:0;padding:0;margin:0;-webkit-appearance:menulist;appearance:auto;
+}
+
+/* ===== Sjednocený vzhled formulářových polí v panelu ===== */
+.panel input[type="text"], .panel input[type="number"], .panel input[type="date"],
+.panel textarea, .panel select {
+  width:100%;
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+  color:var(--text);
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:10px 12px;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s, background .15s;
+}
+.panel input::placeholder, .panel textarea::placeholder{color:var(--text-dim2);}
+.panel input[type="text"]:focus, .panel input[type="number"]:focus, .panel input[type="date"]:focus,
+.panel textarea:focus, .panel select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(138,115,97,.16);
+  background:#fff;
+}
+.panel select{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a7361' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:13px;
+  padding-right:34px;
+  cursor:pointer;
+}
+.panel textarea{resize:vertical;min-height:74px;line-height:1.5;}
+.panel input[type="date"]{cursor:pointer;}
+
+/* ===== PANEL v2 — podle produkčního V&R Ads designu ===== */
+.email-btns{display:flex;gap:8px;margin-bottom:16px;}
+.email-btns .btn{flex:1;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.info-box{background:var(--bg3);border-radius:9px;padding:10px 12px;}
+.info-box .ibl{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;font-weight:700;}
+.info-box .ibv{font-size:14px;font-weight:600;}
+.info-box .ibv.link{color:var(--accent2);}
+.kategorie-select{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 11px;}
+.kategorie-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.kategorie-select select{background:transparent;border:none;color:var(--text);font-size:13.5px;font-weight:700;flex:1;padding:0;}
+.kampan-box{background:var(--bg3);border-radius:9px;padding:12px 14px;margin-bottom:14px;}
+.kampan-box .kbl{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.kampan-box .kname{font-size:15px;font-weight:700;margin-bottom:6px;}
+.kampan-box .kad{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);margin-bottom:5px;}
+.platform-badge{font-size:10px;font-weight:800;padding:2px 6px;border-radius:5px;color:#fff;letter-spacing:.3px;}
+.kampan-box .kweb{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px;}
+.prodej-box{background:#16653414;border:1px solid #22c55e33;border-radius:9px;padding:12px 14px;margin-bottom:14px;}
+.prodej-box .pbl{font-size:12px;font-weight:700;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.field-full{margin-bottom:14px;}
+.field-full label{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+
+/* ===== TABULKA v2 — inline editovatelné bu\u0148ky ===== */
+.inline-select{
+  background:transparent;border:none;color:inherit;font-size:12.5px;font-weight:700;
+  cursor:pointer;padding:0;
+}
+.cell-kategorie{}
+.cell-fáze .date-sub, .cell-kategorie .date-sub{display:block;font-size:10.5px;color:var(--text-dim2);margin-top:2px;font-weight:400;}
+.mini-tag{
+  display:inline-flex;align-items:center;gap:4px;background:var(--bg3);
+  padding:2px 7px;border-radius:6px;font-size:11px;font-weight:700;
+}
+
+/* ===== EMAIL TAB ===== */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+.kpi-card .n{font-size:26px;font-weight:800;font-family:var(--font-mono);}
+.kpi-card .l{font-size:12px;color:var(--text-dim);margin-top:3px;}
+.funnel-bar{display:flex;height:34px;border-radius:9px;overflow:hidden;margin-bottom:20px;border:1px solid var(--border);}
+.funnel-seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;min-width:2%;}
+.cta-banner{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--radius);
+  padding:16px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.cta-banner .txt strong{font-size:15px;}
+.cta-banner .btn-primary{background:#fff;border-color:#fff;color:var(--accent2);font-weight:700;}
+.cta-banner .btn-primary:hover{background:var(--bg3);}
+.cta-banner .txt div{font-size:12.5px;opacity:.9;margin-top:3px;}
+.email-section{margin-bottom:22px;}
+.email-section h4{font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin:0 0 10px;}
+.email-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;}
+.email-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;}
+.email-card .n{font-weight:700;font-size:13.5px;}
+.email-card .f{color:var(--text-dim);font-size:12px;margin-top:1px;}
+
+/* ===== KAMPANE TAB ===== */
+.camp-table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;}
+.camp-table{width:100%;border-collapse:collapse;font-size:13px;min-width:820px;}
+.camp-table th{text-align:left;padding:11px 12px;background:var(--bg3);color:var(--text-dim);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.camp-table td{padding:11px 12px;border-bottom:1px solid var(--border);}
+.camp-table tr:last-child td{border-bottom:none;}
+.roas-good{color:var(--green);font-weight:700;}
+.roas-bad{color:var(--red);font-weight:700;}
+
+/* ===== DENNI TAB ===== */
+.denni-nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;}
+.day-btn{
+  background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);
+  padding:10px 8px;border-radius:10px;min-width:58px;text-align:center;flex-shrink:0;
+  position:relative;
+}
+.day-btn .wd{font-size:11px;text-transform:uppercase;}
+.day-btn .dd{font-size:16px;font-weight:700;margin-top:2px;}
+.day-btn .dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);margin:4px auto 0;}
+.day-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.denni-item{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;margin-bottom:8px;
+}
+.denni-item .who{font-weight:700;font-size:13.5px;}
+.denni-item .fi{color:var(--text-dim);font-size:11.5px;}
+.denni-item .chg{font-size:13px;margin-top:6px;}
+.denni-item .arrow{color:var(--text-dim2);margin:0 6px;}
+.denni-item .note{font-size:12.5px;color:var(--text-dim);margin-top:5px;font-style:italic;}
+
+/* ===== STATS TAB ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:22px;}
+.big-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.big-stat .n{font-size:30px;font-weight:800;font-family:var(--font-mono);}
+.big-stat .l{font-size:12.5px;color:var(--text-dim);margin-top:4px;}
+.phase-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.phase-row:last-child{border-bottom:none;}
+.phase-row .plabel{flex:0 0 190px;font-size:13px;}
+.phase-row .pbar-wrap{flex:1;background:var(--bg3);border-radius:6px;height:10px;overflow:hidden;}
+.phase-row .pbar{height:100%;border-radius:6px;}
+.phase-row .pcount{flex:0 0 34px;text-align:right;font-weight:700;font-size:13px;}
+
+/* ===== MISC ===== */
+.section-title{font-size:15px;font-weight:700;margin:0 0 14px;}
+.hidden{display:none !important;}
+.toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:var(--bg3);border:1px solid var(--border);padding:10px 18px;
+  border-radius:10px;font-size:13px;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:700px){
+  .tabs{display:none;}
+  .bottom-nav{display:block;}
+  .searchbox{min-width:0;flex:1;}
+  .top-actions{width:100%;}
+  .top-actions .btn{flex:1 0 auto;padding:9px 12px;font-size:13px;white-space:nowrap;}
+  .sync-badge{font-size:11px;min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .icon-btn{flex-shrink:0;}
+  .topbar{padding:12px 14px;gap:10px;}
+  .container{padding:14px 14px 30px;}
+  .panel{width:100%;}
+  .table-wrap{display:none;}
+  .only-mobile{display:inline-block;}
+  .phase-row .plabel{flex:0 0 120px;font-size:12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- PŘIHLÁŠENÍ -->
+<div class="login-overlay" id="loginOverlay">
+  <form class="login-card" id="loginForm" onsubmit="return attemptLogin(event)">
+    <div class="login-logo">○ Pure Touch</div>
+    <div class="login-sub">Přístup pouze pro autorizované uživatele</div>
+    <div class="field-full" style="margin-bottom:12px;">
+      <label style="display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Jméno</label>
+      <input type="text" id="loginUser" autocomplete="username" required>
+    </div>
+    <div class="field-full" style="margin-bottom:6px;">
+      <label style="display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Heslo</label>
+      <input type="password" id="loginPass" autocomplete="current-password" required>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button type="submit" class="btn btn-primary">Přihlásit se</button>
+  </form>
+</div>
+
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> PURE TOUCH</div>
+  <div class="tabs">
+    <button class="tab" data-tab="table" onclick="setTab('table')">📋 Tabulka</button>
+    <button class="tab" data-tab="stats" onclick="setTab('stats')">📈 Statistiky</button>
+    <button class="tab" data-tab="kampane" onclick="setTab('kampane')">📊 Kampaně</button>
+    <button class="tab" data-tab="denni" onclick="setTab('denni')">📅 Denní</button>
+  </div>
+  <input class="searchbox" id="searchInput" placeholder="Hledat…" oninput="onSearch()">
+  <div class="top-actions">
+    <span class="sync-badge" id="syncBadge">–</span>
+    <button class="icon-btn" title="Obnovit data" onclick="loadAll()">⟳</button>
+    <button class="btn btn-primary" onclick="syncFromSheet()">📥 Aktualizovat leady</button>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filterbar">
+  <select id="filterStage" onchange="onFilterChange()">
+    <option value="">Všechny fáze</option>
+  </select>
+  <select id="filterService" onchange="onFilterChange()">
+    <option value="">Vše – kontakt</option>
+  </select>
+  <select id="filterZajem" onchange="onFilterChange()">
+    <option value="">Vše – zájem</option>
+  </select>
+  <select id="sortSel" class="only-mobile" onchange="onSortSel()">
+    <option value="datum:desc">Řadit: nejnovější</option>
+    <option value="datum:asc">Řadit: nejstarší</option>
+    <option value="jmeno:asc">Řadit: jméno A–Z</option>
+    <option value="stav:asc">Řadit: fáze</option>
+  </select>
+  <select id="filterProdej" onchange="onFilterChange()">
+    <option value="">Prodej – vše</option>
+    <option value="ano">Jen s prodejem</option>
+    <option value="ne">Bez prodeje</option>
+  </select>
+</div>
+
+<div class="container">
+
+  <!-- STATS BAR (nad tabulkou/kartami) -->
+  <div class="statsbar" id="statsBar"></div>
+
+  <!-- TABULKA (desktop) -->
+  <div class="table-wrap" id="view-table">
+    <table>
+      <thead>
+        <tr id="tableHeadRow">
+          <th data-sort="datum">Datum <span class="sort-arrow">▲</span></th>
+          <th data-sort="jmeno">Jméno <span class="sort-arrow">▲</span></th>
+          <th>Telefon</th>
+          <th>Email</th>
+          <th>Jak kontaktovat</th>
+          <th>Kdy začít</th>
+          <th>Zájem o</th>
+          <th>Poznámka</th>
+          <th data-sort="stav">Fáze <span class="sort-arrow">▲</span></th>
+          <th>€</th>
+          <th>Produkt</th>
+          <th>Follow-up</th>
+          <th>Poznámky</th>
+          <th>Kampaň</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- KARTY (mobile) -->
+
+  <!-- KARTY (telefon) -->
+  <div class="cards" id="view-cards"></div>
+
+  <!-- STATISTIKY -->
+  <div id="view-stats" style="display:none;"></div>
+
+  <!-- EMAIL -->
+  <!-- KAMPANĚ -->
+  <div id="view-kampane" style="display:none;"></div>
+
+  <!-- DENNÍ -->
+  <div id="view-denni" style="display:none;"></div>
+
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<div class="bottom-nav">
+  <div class="bn-row">
+    <button class="bn-item" id="bn-table" onclick="setTab('table')"><span class="ic">📋</span>Leady</button>
+    <button class="bn-item" id="bn-stats" onclick="setTab('stats')"><span class="ic">📈</span>Stats</button>
+    <button class="bn-item" id="bn-kampane" onclick="setTab('kampane')"><span class="ic">📊</span>Kampaně</button>
+    <button class="bn-item" id="bn-denni" onclick="setTab('denni')"><span class="ic">📅</span>Denní</button>
+  </div>
+</div>
+
+<!-- PANEL (detail leadu) -->
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel(event)">
+  <div class="panel" id="leadPanel" onclick="event.stopPropagation()">
+    <button class="panel-close" onclick="closePanel()">✕</button>
+    <h3 id="pName">—</h3>
+    <div class="sub" id="pFirma">—</div>
+
+    <div class="two-col">
+      <div>
+        <label style="display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Stav (kategorie)</label>
+        <div class="kategorie-select">
+          <span class="kategorie-dot" id="pKatDot"></span>
+          <select id="pKategorie" onchange="onKategorieChange()">
+            <option value="otevreno">Otevřeno</option>
+            <option value="uzavreno">Uzavřeno</option>
+            <option value="konec">Konec</option>
+            <option value="">Bez stavu</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Fáze</label>
+        <select id="pStage" onchange="onStageChange()"></select>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-box"><div class="ibl">Email</div><div class="ibv link" id="pInfoEmail">—</div></div>
+      <div class="info-box"><div class="ibl">Telefon</div><div class="ibv" id="pInfoTel">—</div></div>
+    </div>
+
+    <div class="info-box" style="margin-bottom:14px;">
+      <div class="ibl">Zájem o</div>
+      <div class="ibv" id="pInfoZajem">—</div>
+    </div>
+
+    <div class="info-box" style="margin-bottom:14px;">
+      <div class="ibl">Kdy chce začít</div>
+      <div class="ibv" id="pInfoProblem">—</div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-box"><div class="ibl">Jak kontaktovat</div><div class="ibv" id="pInfoLokalita">—</div></div>
+      <div class="info-box"><div class="ibl">Datum přijetí</div><div class="ibv" id="pInfoDatum">—</div></div>
+    </div>
+
+    <div class="kampan-box">
+      <div class="kbl">📣 Kampaň</div>
+      <div class="kname" id="pKampanName">—</div>
+      <div class="kad" id="pKampanAd" style="display:none;">
+        <span class="platform-badge" id="pKampanPlatform">FB</span>
+        <span id="pKampanAdName"></span>
+      </div>
+      <div class="kweb" id="pKampanWeb" style="display:none;">🌐 <span id="pKampanWebText"></span></div>
+    </div>
+
+    <div class="prodej-box">
+      <div class="pbl">💰 Prodej</div>
+      <div class="two-col" style="margin-bottom:10px;">
+        <div>
+          <label style="display:block;font-size:10.5px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Částka (€)</label>
+          <input type="number" id="pCastka" placeholder="0">
+        </div>
+        <div>
+          <label style="display:block;font-size:10.5px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Produkt</label>
+          <input type="text" id="pProdukt" placeholder="např. Masáže">
+        </div>
+      </div>
+      <label style="display:block;font-size:10.5px;color:var(--text-dim);margin-bottom:5px;font-weight:700;text-transform:uppercase;">Poznámka k prodeji</label>
+      <input type="text" id="pProdejNote" placeholder="Datum podpisu, podmínky…">
+    </div>
+
+    <div class="field-full">
+      <label>📅 Follow-up datum</label>
+      <input type="date" id="pFollowup">
+    </div>
+
+    <div class="field-full">
+      <label>📝 Moje poznámky</label>
+      <textarea id="pNotes" placeholder="Poznámky, historie komunikace…"></textarea>
+    </div>
+
+    <div class="field-full">
+      <label>📣 Kampaň (ruční přiřazení)</label>
+      <input type="text" id="pKampan" placeholder="Název kampaně / kreativy">
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;" onclick="savePanel()">Zavřít a uložit</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   V&R ADS CRM — jeden HTML soubor, Supabase backend
+   ============================================================ */
+
+// ---------- SUPABASE CREDENTIALS (neměnit bez výslovné žádosti) ----------
+const SB = 'https://gcrpcrlcaqfbxtjizysb.supabase.co';
+const SK = 'sb_publishable_H9DvsObN_UNX5eBXEBza-Q_mEdetygN';
+const H  = {'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json'};
+
+// Google Sheet s leady z Meta formulářů. Každý list (záložka) má své gid – další list přidáš sem.
+const GSHEET_ID = '10exnWTLmSPesrHW2Z58aBTvSyBDcCQ4srEr9FvmiHSw';
+const GSHEET_TABS = [
+  {gid:'0',         name:'List 1'},
+  {gid:'369433000', name:'List 2'}
+];
+const gsheetUrl = gid => `https://docs.google.com/spreadsheets/d/${GSHEET_ID}/export?format=csv&gid=${gid}`;
+
+// ---------- FAZE MODEL ----------
+const FAZE = [
+  {id:'',                    label:'—',                          poz:'',         cls:'b-none',  color:'#64748b'},
+  {id:'volat',                label:'Volat 📞',                   poz:'otevreno', cls:'b-volat', color:'#eab308'},
+  {id:'nezvedan1',            label:'Nezvedá 1 ☎️',               poz:'otevreno', cls:'b-nez1',  color:'#f59e0b'},
+  {id:'nezvedan2',            label:'Nezvedá 2 ☎️',               poz:'otevreno', cls:'b-nez2',  color:'#f97316'},
+  {id:'nezvedan3',            label:'Nezvedá 3 ☎️',               poz:'otevreno', cls:'b-nez3',  color:'#ea580c'},
+  {id:'komunikace_email',     label:'Komunikace email 📧',        poz:'otevreno', cls:'b-kem',   color:'#38bdf8'},
+  {id:'komunikace_sms',       label:'Komunikace SMS 💬',          poz:'otevreno', cls:'b-ksms',  color:'#22d3ee'},
+  {id:'email_odeslano',       label:'Email odeslán 📤',           poz:'otevreno', cls:'b-emo',   color:'#0ea5e9'},
+  {id:'domluvena_schuzka',    label:'Domluvena schuzka ✅',       poz:'otevreno', cls:'b-sch',   color:'#a855f7'},
+  {id:'zaplacena_zaloha',     label:'Zaplacena záloha 💶',        poz:'otevreno', cls:'b-zzal',  color:'#d4a24c'},
+  {id:'odeslana_zaloh_faktura', label:'Odeslana zaloh. faktura 🧾', poz:'otevreno', cls:'b-fak', color:'#14b8a6'},
+  {id:'poskytnuta_sluzba',    label:'Poskytnuta služba 💚',       poz:'uzavreno', cls:'b-uz',    color:'#16a34a'},
+  {id:'nerelevantni',         label:'Nerelevantní ☹️',            poz:'konec',    cls:'b-nrl',   color:'#6b7280'},
+  {id:'konec',                label:'Konec ❌',                   poz:'konec',    cls:'b-end',   color:'#ef4444'},
+];
+const FAZE_MAP = {};
+FAZE.forEach(f => FAZE_MAP[f.id] = f);
+function getPoz(stav) { return (FAZE_MAP[stav] || FAZE[0]).poz; }
+function getFaze(stav) { return FAZE_MAP[stav] || FAZE[0]; }
+
+const POZ_COLOR = {otevreno:'#eab308', uzavreno:'#22c55e', konec:'#ef4444', '':'#64748b'};
+const POZ_LABEL = {otevreno:'otevřen', uzavreno:'uzavřen', konec:'konec', '':'bez stavu'};
+// reprezentativní fáze při rychlém přepnutí kategorie
+const POZ_DEFAULT_STAV = {otevreno:'volat', uzavreno:'poskytnuta_sluzba', konec:'konec', '':''};
+
+const PLATFORM_COLOR = {META:'#1877F2', FB:'#1877F2', FACEBOOK:'#1877F2', GOOGLE:'#EA4335', IG:'#E1306C', INSTAGRAM:'#E1306C', TIKTOK:'#000000'};
+function platformShort(p){
+  const u = (p||'').toUpperCase();
+  if (u.includes('FACEBOOK') || u==='META') return 'FB';
+  if (u.includes('INSTA')) return 'IG';
+  if (u.includes('GOOGLE')) return 'GOOGLE';
+  if (u.includes('TIKTOK')) return 'TT';
+  return p || 'FB';
+}
+
+// ---------- STATE ----------
+let leads = [];          // merged leads + crm_data
+let fbSpend = {};         // campaign_name -> spend
+let currentTab = 'table';
+let currentLead = null;
+let searchTerm = '';
+let filterStage = '';
+let filterService = '';
+let filterZajem = '';
+let filterProdej = '';
+let filterChip = '';      // '', 'otevreno', 'uzavreno', 'konec', 'bez', 'followup'
+let sortField = 'datum';
+let sortDir = 'desc';
+let accOpen = {};         // panel accordion open state
+let denniBuf = [], denniDay = null, denniLoading = false, denniCounts = {};
+const WD = ['Ne','Po','Út','St','Čt','Pá','So'];
+
+function isMobile(){ return window.innerWidth <= 700; }
+function mob(){ return isMobile(); }
+
+// ============================================================
+// SYNC BADGE
+// ============================================================
+function showSync(msg, color){
+  const b = document.getElementById('syncBadge');
+  b.textContent = msg;
+  b.style.color = color || 'var(--text-dim)';
+}
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), Math.max(2600, Math.min(9000, msg.length * 55)));
+}
+
+// ============================================================
+// LOAD DATA — leads + crm_data merge, fb_spend
+// ============================================================
+async function loadAll(silent){
+  if (silent !== true) showSync('⏳ Načítám…', '#d97706');
+  try{
+    const [leadsRes, crmRes, spendRes] = await Promise.all([
+      fetch(SB+'/rest/v1/leads?select=*&order=created_at.desc', {headers:H}),
+      fetch(SB+'/rest/v1/crm_data?select=*', {headers:H}),
+      fetch(SB+'/rest/v1/fb_spend?select=*', {headers:H}).catch(()=>null)
+    ]);
+    if (!leadsRes.ok) throw new Error('Načtení leadů selhalo (' + leadsRes.status + ')');
+    if (!crmRes.ok)   throw new Error('Načtení dat CRM selhalo (' + crmRes.status + ')');
+    const leadsData = await leadsRes.json();
+    const crmData   = await crmRes.json();
+    const crmMap = {};
+    crmData.forEach(c => crmMap[c.email] = c);
+
+    leads = leadsData.map(l => {
+      const c = crmMap[l.email] || {};
+      return {
+        ...l,
+        stav: c.stav || '',
+        poz: getPoz(c.stav || ''),
+        prodej_castka: c.prodej_castka || '',
+        prodej_mena: c.prodej_mena || 'Kč',
+        prodej_produkt: c.prodej_produkt || '',
+        prodej_note: c.prodej_note || '',
+        followup: c.followup || '',
+        myNotes: c.my_notes || '',
+        updated_at: c.updated_at || null,
+      };
+    });
+
+    fbSpend = {};
+    if (spendRes && spendRes.ok){
+      const sd = await spendRes.json();
+      sd.forEach(s => fbSpend[s.campaign_name] = Number(s.spend) || 0);
+    }
+
+    showSync('✅ Synchronizováno ' + new Date().toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'}), '#16a34a');
+  }catch(e){
+    showSync('⚠️ Chyba načítání', '#ef4444');
+    console.error(e);
+  }
+  populateFilters();
+  render();
+  loadDenniCounts();
+}
+
+function populateFilters(){
+  const stageSel = document.getElementById('filterStage');
+  if (stageSel && stageSel.options.length <= 1){
+    FAZE.filter(f=>f.id).forEach(f => {
+      const o = document.createElement('option');
+      o.value = f.id; o.textContent = f.label;
+      stageSel.appendChild(o);
+    });
+  }
+  const svcSel = document.getElementById('filterService');
+  if (svcSel){
+    const cur = svcSel.value;
+    const services = [...new Set(leads.map(l=>l.sluzba).filter(Boolean))].sort();
+    svcSel.innerHTML = '<option value="">Vše – kontakt</option>' +
+      services.map(s => `<option value="${escAttr(s)}">${esc(s)}</option>`).join('');
+    svcSel.value = cur;
+  }
+  const zSel = document.getElementById('filterZajem');
+  if (zSel){
+    const cur = zSel.value;
+    const zs = [...new Set(leads.map(l=>l.zajem_o).filter(Boolean))].sort();
+    zSel.innerHTML = '<option value="">Vše – zájem</option>' +
+      zs.map(s => `<option value="${escAttr(s)}">${esc(s)}</option>`).join('');
+    zSel.value = cur;
+  }
+}
+
+function onFilterChange(){
+  filterStage = document.getElementById('filterStage').value;
+  filterService = document.getElementById('filterService').value;
+  filterZajem = document.getElementById('filterZajem').value;
+  filterProdej = document.getElementById('filterProdej').value;
+  render();
+}
+
+function setChipFilter(chip){
+  filterChip = (filterChip === chip) ? '' : chip;
+  render();
+}
+
+function onSortSel(){
+  const [f,d] = document.getElementById('sortSel').value.split(':');
+  sortField = f; sortDir = d; render();
+}
+function setSort(field){
+  if (sortField === field){ sortDir = (sortDir === 'asc') ? 'desc' : 'asc'; }
+  else { sortField = field; sortDir = 'asc'; }
+  render();
+}
+
+// ============================================================
+// SAVE — saveToApi (PATCH crm_data, INSERT pokud neexistuje)
+// ============================================================
+// Sloupce v crm_data podle polí v aplikaci
+const COLMAP = {followup:'followup', myNotes:'my_notes', prodej_castka:'prodej_castka', prodej_produkt:'prodej_produkt', prodej_note:'prodej_note'};
+function fullData(lead){
+  return {
+    stav: lead.stav, poz: lead.poz || getPoz(lead.stav) || null,
+    prodej_castka: lead.prodej_castka || null,
+    prodej_mena: lead.prodej_mena || 'Kč',
+    prodej_produkt: lead.prodej_produkt || null,
+    prodej_note: lead.prodej_note || null,
+    followup: lead.followup || null,
+    my_notes: lead.myNotes || null,
+    updated_at: new Date().toISOString()
+  };
+}
+// Jen změněná pole -> starší otevřená kopie na jiném zařízení nepřepíše novější změny ostatních polí
+function partialData(lead, keys){
+  const d = {updated_at: new Date().toISOString()};
+  keys.forEach(k => {
+    if (k === 'stav'){ d.stav = lead.stav; d.poz = lead.poz || getPoz(lead.stav) || null; }
+    else if (COLMAP[k]){ const v = lead[k]; d[COLMAP[k]] = (v === '' || v === undefined) ? null : v; }
+  });
+  return d;
+}
+
+let pendingSaves = 0;
+async function saveToApi(lead, oldStav, passedOldNotes, keys) {
+  showSync('💾 Ukládám…', '#d97706');
+  pendingSaves++;
+  try {
+    const idx = leads.findIndex(l => l.email === lead.email);
+    const oldNotes = passedOldNotes !== undefined
+      ? passedOldNotes
+      : (idx >= 0 ? (leads[idx].myNotes || '') : '');
+    if (idx >= 0) leads[idx] = {...leads[idx], ...lead};
+
+    const data = keys ? partialData(lead, keys) : fullData(lead);
+    const enc = encodeURIComponent(lead.email);
+    const pr = await fetch(SB+'/rest/v1/crm_data?email=eq.'+enc, {
+      method: 'PATCH',
+      headers: {...H, 'Prefer': 'return=representation'},
+      body: JSON.stringify(data)
+    });
+    if (!pr.ok) throw new Error(await pr.text());
+    const updated = await pr.json();
+    if (!updated || updated.length === 0) {
+      // Řádek neexistuje — INSERT (vždy s kompletními daty)
+      const ir = await fetch(SB+'/rest/v1/crm_data', {
+        method: 'POST',
+        headers: {...H, 'Prefer': 'return=minimal'},
+        body: JSON.stringify({email: lead.email, ...fullData(lead)})
+      });
+      if (!ir.ok) throw new Error(await ir.text());
+    }
+    showSync('✅ Uloženo', '#16a34a');
+
+    // Loguj změnu fáze
+    if (oldStav !== undefined && oldStav !== lead.stav)
+      await logActivity(lead, 'stav_zmena', {old_stav: oldStav, new_stav: lead.stav});
+
+    // Loguj změnu poznámky (jen diff)
+    const newNotes = (lead.myNotes || '').trim();
+    const oldN = oldNotes.trim();
+    if (newNotes && newNotes !== oldN) {
+      let diff = newNotes;
+      if (oldN && newNotes.startsWith(oldN)) diff = newNotes.slice(oldN.length).trim();
+      else if (oldN && newNotes.endsWith(oldN)) diff = newNotes.slice(0, newNotes.length - oldN.length).trim();
+      await logActivity(lead, 'poznamka', {note: diff || newNotes});
+    }
+  } catch(e) { showSync('⚠️ '+e.message, '#d97706'); }
+  finally { pendingSaves--; }
+}
+
+// ============================================================
+// LOG ACTIVITY
+// ============================================================
+async function logActivity(lead, action, opts = {}) {
+  try {
+    const entry = {
+      lead_email: lead.email,
+      lead_name:  lead.jmeno  || '',
+      lead_firma: lead.firma  || '',
+      action,
+      old_stav: opts.old_stav || '',
+      new_stav: opts.new_stav || '',
+      note:     opts.note     || null
+    };
+    await fetch(SB+'/rest/v1/activity_log', {
+      method: 'POST',
+      headers: {...H, 'Prefer': 'return=minimal'},
+      body: JSON.stringify(entry)
+    });
+  } catch(e) { /* tiché logování */ }
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function setTab(t) {
+  currentTab = t;
+  document.querySelectorAll('.tab').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === t));
+  ['table','stats','kampane','denni'].forEach(id => {
+    const el = document.getElementById('bn-'+id);
+    if (el) el.classList.toggle('active', id === t);
+  });
+  document.getElementById('view-table').style.display   = (t==='table' && !mob()) ? '' : 'none';
+  document.getElementById('view-cards').style.display   = (t==='table' &&  mob()) ? 'block' : 'none';
+  document.getElementById('view-stats').style.display   = t==='stats'   ? 'block' : 'none';
+  document.getElementById('view-kampane').style.display = t==='kampane' ? 'block' : 'none';
+  document.getElementById('view-denni').style.display   = t==='denni'   ? 'block' : 'none';
+  render();
+}
+
+function onSearch(){
+  searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+  render();
+}
+
+function getFiltered(){
+  let out = leads;
+  if (searchTerm){
+    out = out.filter(l =>
+      (l.jmeno||'').toLowerCase().includes(searchTerm) ||
+      (l.firma||'').toLowerCase().includes(searchTerm) ||
+      (l.email||'').toLowerCase().includes(searchTerm) ||
+      (l.telefon||'').toLowerCase().includes(searchTerm)
+    );
+  }
+  if (filterStage) out = out.filter(l => l.stav === filterStage);
+  if (filterService) out = out.filter(l => l.sluzba === filterService);
+  if (filterZajem) out = out.filter(l => l.zajem_o === filterZajem);
+  if (filterProdej === 'ano') out = out.filter(l => Number(l.prodej_castka) > 0);
+  if (filterProdej === 'ne') out = out.filter(l => !(Number(l.prodej_castka) > 0));
+
+  if (filterChip === 'otevreno') out = out.filter(l => getPoz(l.stav)==='otevreno');
+  else if (filterChip === 'uzavreno') out = out.filter(l => getPoz(l.stav)==='uzavreno');
+  else if (filterChip === 'konec') out = out.filter(l => getPoz(l.stav)==='konec');
+  else if (filterChip === 'bez') out = out.filter(l => !getPoz(l.stav));
+  else if (filterChip === 'followup') out = out.filter(l => !!l.followup);
+
+  out = [...out].sort((a,b) => {
+    let av, bv;
+    if (sortField === 'stav'){ av = getFaze(a.stav).label; bv = getFaze(b.stav).label; }
+    else { av = a[sortField] || ''; bv = b[sortField] || ''; }
+    const cmp = String(av).localeCompare(String(bv), 'cs');
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+  return out;
+}
+
+// ============================================================
+// MASTER RENDER
+// ============================================================
+function render() {
+  renderStatsBar();
+  if      (currentTab === 'table' && !isMobile()) renderTable();
+  else if (currentTab === 'table' &&  isMobile()) renderCards();
+  else if (currentTab === 'stats')    renderStats();
+  else if (currentTab === 'kampane')  renderKampane();
+  else if (currentTab === 'denni')    renderDenni();
+}
+
+// ============================================================
+// STATS BAR (nad tabulkou) — vždy počítá z getPoz(stav)
+// ============================================================
+function renderStatsBar(){
+  const total = leads.length;
+  const ot = leads.filter(l => getPoz(l.stav) === 'otevreno').length;
+  const uz = leads.filter(l => getPoz(l.stav) === 'uzavreno').length;
+  const ko = leads.filter(l => getPoz(l.stav) === 'konec').length;
+  const no = leads.filter(l => !getPoz(l.stav)).length;
+  const fu = leads.filter(l => !!l.followup).length;
+  const sel = c => filterChip === c ? 'selected' : '';
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-chip tot ${sel('')}" onclick="setChipFilter('')"><div class="num">${total}</div><div class="lbl">Celkem</div></div>
+    <div class="stat-chip ot ${sel('otevreno')}" onclick="setChipFilter('otevreno')"><div class="num">${ot}</div><div class="lbl">Otevřeno</div></div>
+    <div class="stat-chip uz ${sel('uzavreno')}" onclick="setChipFilter('uzavreno')"><div class="num">${uz}</div><div class="lbl">Uzavřeno</div></div>
+    <div class="stat-chip ko ${sel('konec')}" onclick="setChipFilter('konec')"><div class="num">${ko}</div><div class="lbl">Konec</div></div>
+    <div class="stat-chip no ${sel('bez')}" onclick="setChipFilter('bez')"><div class="num">${no}</div><div class="lbl">Bez statusu</div></div>
+    <div class="stat-chip fu ${sel('followup')}" onclick="setChipFilter('followup')"><div class="num">${fu}</div><div class="lbl">📅 Follow-up</div></div>
+  `;
+}
+
+
+// ============================================================
+// TABLE VIEW (desktop)
+// ============================================================
+function renderTable(){
+  const filtered = getFiltered();
+  const tbody = document.getElementById('tableBody');
+
+  document.querySelectorAll('#tableHeadRow th[data-sort]').forEach(th => {
+    const f = th.dataset.sort;
+    th.classList.toggle('sorted', f === sortField);
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = (f === sortField && sortDir === 'desc') ? '▼' : '▲';
+    th.onclick = () => setSort(f);
+  });
+
+  if (!filtered.length){
+    tbody.innerHTML = `<tr><td colspan="14"><div class="empty-state">Žádní leadi neodpovídají filtru.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(l => {
+    const f = getFaze(l.stav);
+    const poz = getPoz(l.stav) || '';
+    const pozColor = POZ_COLOR[poz];
+    const note = (l.myNotes||'').slice(0,30) + ((l.myNotes||'').length>30?'…':'');
+    const castka = l.prodej_castka ? `<span style="color:var(--green);font-weight:700;">${Number(l.prodej_castka).toLocaleString('cs-CZ')} €</span>` : '<span class="muted">–</span>';
+    const plat = platformShort(l.platform);
+    const platColor = PLATFORM_COLOR[(l.platform||'FB').toUpperCase()] || '#1877F2';
+
+    return `<tr>
+      <td class="muted" onclick="openLeadPanel('${escAttr(l.email)}')">${fmtDate(l.datum || l.created_at)}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.jmeno)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.telefon)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.email)}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.sluzba)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.problem)||'<span class="muted">–</span>'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.zajem_o)||'<span class="muted">–</span>'}</td>
+      <td class="cell-kategorie">${kategoriePill(l)}</td>
+      <td class="cell-fáze">${fazePill(l)}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${castka}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${esc(l.prodej_produkt)||'<span class="muted">–</span>'}</td>
+      <td class="cell-followup">${followupCell(l)}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')" class="muted">${esc(note)||'–'}</td>
+      <td onclick="openLeadPanel('${escAttr(l.email)}')">${l.campaign_name ? `<span class="mini-tag"><span class="platform-badge" style="background:${platColor};padding:1px 4px;font-size:9px;">${plat}</span> ${esc(l.campaign_name)}</span>` : '<span class="muted">–</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Follow-up přímo v tabulce (viditelný a přepisovatelný)
+function todayPrague(){ return new Date().toLocaleDateString('sv-SE', {timeZone:'Europe/Prague'}); }
+function followupCell(l){
+  const over = l.followup && l.followup < todayPrague() && !['uzavreno','konec'].includes(getPoz(l.stav));
+  return `<div class="date-pill ${l.followup?'has':''} ${over?'over':''}" title="${over?'Follow-up po termínu – ':''}klikni pro změnu">
+    <input type="date" value="${escAttr(l.followup||'')}" onchange="inlineSetFollowup('${escAttr(l.email)}', this.value)">
+    ${l.followup ? `<button type="button" class="date-clear" title="Smazat follow-up" onclick="inlineSetFollowup('${escAttr(l.email)}','')">×</button>` : ''}
+  </div>`;
+}
+async function inlineSetFollowup(email, value){
+  const lead = leads.find(l => l.email === email);
+  if (!lead) return;
+  lead.followup = value || '';
+  await saveToApi(lead, lead.stav, lead.myNotes || '', ['followup']);
+  render();
+}
+
+// Inline úpravy přímo v tabulce (bez otevření panelu)
+// Spolehlivé otevření native <select> kliknutím kdekoli v buňce (label-forwarding
+// není na mobilním Safari spolehlivé, proto select má pointer-events:none a
+// otevíráme ho programově přes .focus()+.click())
+function openInlineSelect(wrapper){
+  const sel = wrapper.querySelector('select');
+  if (!sel) return;
+  sel.focus();
+  sel.click();
+}
+
+async function inlineSetKategorie(email, poz){
+  const lead = leads.find(l => l.email === email);
+  if (!lead) return;
+  const oldStav = lead.stav;
+  lead.stav = POZ_DEFAULT_STAV[poz];
+  lead.poz = getPoz(lead.stav);
+  await saveToApi(lead, oldStav, undefined, ['stav']);
+  render();
+}
+async function inlineSetStav(email, stav){
+  const lead = leads.find(l => l.email === email);
+  if (!lead) return;
+  const oldStav = lead.stav;
+  lead.stav = stav;
+  lead.poz = getPoz(stav);
+  await saveToApi(lead, oldStav, undefined, ['stav']);
+  render();
+}
+
+// ---------- Bubliny (používá tabulka na PC i karty na telefonu) ----------
+function kategoriePill(l){
+  const poz = getPoz(l.stav) || '';
+  return `<div class="pill" style="--c:${POZ_COLOR[poz]}" title="Klikni pro změnu">
+    <span class="pill-dot"></span>
+    <span class="pill-text">${POZ_LABEL[poz]}</span>
+    <span class="pill-chev">▾</span>
+    <select class="pill-native" onchange="inlineSetKategorie('${escAttr(l.email)}', this.value)">
+      <option value="otevreno" ${poz==='otevreno'?'selected':''}>otevřen</option>
+      <option value="uzavreno" ${poz==='uzavreno'?'selected':''}>uzavřen</option>
+      <option value="konec" ${poz==='konec'?'selected':''}>konec</option>
+      <option value="" ${poz===''?'selected':''}>bez stavu</option>
+    </select>
+  </div>`;
+}
+function fazePill(l){
+  const f = getFaze(l.stav);
+  return `<div class="pill pill-faze" style="--c:${f.color}" title="Klikni pro změnu">
+    <span class="pill-text">${l.stav ? f.label : 'Vybrat fázi'}</span>
+    <span class="pill-chev">▾</span>
+    <span class="date-sub">📅 ${l.updated_at ? fmtDate(l.updated_at) : '–'}</span>
+    <select class="pill-native" onchange="inlineSetStav('${escAttr(l.email)}', this.value)">
+      ${buildStageOptions(l.stav)}
+    </select>
+  </div>`;
+}
+
+// ---------- Karty pro telefon (všechny údaje + úpravy přímo v kartě) ----------
+function renderCards(){
+  const filtered = getFiltered();
+  const wrap = document.getElementById('view-cards');
+  if (!filtered.length){
+    wrap.innerHTML = `<div class="empty-state">Žádní leadi neodpovídají filtru.</div>`;
+    return;
+  }
+  wrap.innerHTML = filtered.map(l => {
+    const em = escAttr(l.email);
+    const open = `onclick="openLeadPanel('${em}')"`;
+    const plat = platformShort(l.platform);
+    const platColor = PLATFORM_COLOR[(l.platform||'FB').toUpperCase()] || '#1877F2';
+    const tel = l.telefon ? `<a href="tel:${escAttr(String(l.telefon).replace(/\s/g,''))}">📞 ${esc(l.telefon)}</a>` : '';
+    const sale = (l.prodej_castka || l.prodej_produkt)
+      ? `<div class="mcard-sale" ${open}>💰 <b>${l.prodej_castka ? Number(l.prodej_castka).toLocaleString('cs-CZ')+' €' : '–'}</b>${l.prodej_produkt ? ' · '+esc(l.prodej_produkt) : ''}</div>` : '';
+    const note = l.myNotes ? `<div class="mcard-note" ${open}>📝 ${esc(l.myNotes)}</div>` : '';
+    const camp = l.campaign_name ? `<div class="mcard-camp" ${open}><span class="platform-badge" style="background:${platColor}">${plat}</span> ${esc(l.campaign_name)}${l.ad_name ? ' · '+esc(l.ad_name) : ''}</div>` : '';
+    return `<div class="mcard">
+      <div class="mcard-top" ${open}>
+        <div class="mcard-name">${esc(l.jmeno)||esc(l.email)}</div>
+        <div class="mcard-date">${fmtDate(l.datum || l.created_at)}</div>
+      </div>
+      <div class="mcard-contact">${tel}<a href="mailto:${em}">✉️ ${esc(l.email)}</a></div>
+      <div class="mcard-grid" ${open}>
+        ${l.zajem_o ? `<div style="grid-column:1/-1"><div class="mlbl">Zájem o</div><div class="mval">${esc(l.zajem_o)}</div></div>` : ''}
+        <div><div class="mlbl">Jak kontaktovat</div><div class="mval">${esc(l.sluzba)||'–'}</div></div>
+        <div><div class="mlbl">Kdy začít</div><div class="mval">${esc(l.problem)||'–'}</div></div>
+      </div>
+      <div class="mcard-pills">${kategoriePill(l)}${fazePill(l)}</div>
+      <div class="mcard-fu"><span class="mlbl">Follow-up</span>${followupCell(l)}</div>
+      ${sale}${note}${camp}
+      <button type="button" class="mcard-more" ${open}>Detail a úpravy ›</button>
+    </div>`;
+  }).join('');
+}
+
+function fmtDate(d){
+  if (!d) return '–';
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d));
+  if (m) return `${+m[3]}. ${+m[2]}. ${m[1]}`;               // čisté datum bez posunu časových pásem
+  const dt = new Date(d);
+  if (isNaN(dt)) return esc(String(d));
+  return dt.toLocaleDateString('cs-CZ', {timeZone:'Europe/Prague'});
+}
+function esc(s){ return (s===undefined||s===null) ? '' : String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escAttr(s){ return esc(s).replace(/'/g, '&#39;'); }
+
+// ============================================================
+// LEAD PANEL
+// ============================================================
+function buildStageOptions(selected){
+  return FAZE.map(f => `<option value="${f.id}" ${f.id===selected?'selected':''}>${f.label}</option>`).join('');
+}
+
+function openLeadPanel(email){
+  const lead = leads.find(l => l.email === email);
+  if (!lead) return;
+  currentLead = lead;
+  document.getElementById('pName').textContent = lead.jmeno || lead.email;
+  document.getElementById('pFirma').textContent = lead.firma || '—';
+
+  document.getElementById('pInfoEmail').textContent = lead.email || '—';
+  document.getElementById('pInfoTel').textContent = lead.telefon || 'neuvedeno';
+  document.getElementById('pInfoProblem').textContent = lead.problem || 'neuvedeno';
+  document.getElementById('pInfoZajem').textContent = lead.zajem_o || 'neuvedeno';
+  document.getElementById('pInfoLokalita').textContent = lead.sluzba || 'neuvedeno';
+  document.getElementById('pInfoDatum').textContent = fmtDate(lead.datum || lead.created_at);
+
+  document.getElementById('pStage').innerHTML = buildStageOptions(lead.stav);
+  const poz = getPoz(lead.stav) || '';
+  document.getElementById('pKategorie').value = poz;
+  document.getElementById('pKatDot').style.background = POZ_COLOR[poz];
+
+  document.getElementById('pFollowup').value = lead.followup || '';
+  document.getElementById('pNotes').value = lead.myNotes || '';
+  document.getElementById('pCastka').value = lead.prodej_castka || '';
+  document.getElementById('pProdukt').value = lead.prodej_produkt || '';
+  document.getElementById('pProdejNote').value = lead.prodej_note || '';
+  document.getElementById('pKampan').value = lead.campaign_name || '';
+
+  document.getElementById('pKampanName').textContent = lead.campaign_name || 'Bez kampaně';
+  if (lead.ad_name){
+    document.getElementById('pKampanAd').style.display = 'flex';
+    document.getElementById('pKampanPlatform').textContent = platformShort(lead.platform);
+    document.getElementById('pKampanPlatform').style.background = PLATFORM_COLOR[(lead.platform||'FB').toUpperCase()] || '#1877F2';
+    document.getElementById('pKampanAdName').textContent = lead.ad_name;
+  } else {
+    document.getElementById('pKampanAd').style.display = 'none';
+  }
+  if (lead.firma){
+    document.getElementById('pKampanWeb').style.display = 'flex';
+    document.getElementById('pKampanWebText').textContent = lead.firma;
+  } else {
+    document.getElementById('pKampanWeb').style.display = 'none';
+  }
+
+  document.getElementById('panelOverlay').classList.add('open');
+  document.getElementById('leadPanel').classList.add('open');
+}
+
+function onKategorieChange(){
+  const poz = document.getElementById('pKategorie').value;
+  document.getElementById('pKatDot').style.background = POZ_COLOR[poz];
+  // nastav fázi na reprezentativní hodnotu dané kategorie
+  document.getElementById('pStage').value = POZ_DEFAULT_STAV[poz];
+}
+function onStageChange(){
+  const stav = document.getElementById('pStage').value;
+  const poz = getPoz(stav) || '';
+  document.getElementById('pKategorie').value = poz;
+  document.getElementById('pKatDot').style.background = POZ_COLOR[poz];
+}
+
+function copyLeadEmail(){
+  if (!currentLead) return;
+  navigator.clipboard.writeText(currentLead.email).then(() => showToast('Email zkopírován')).catch(()=>{});
+}
+function openMailClient(){
+  if (!currentLead) return;
+  window.location.href = 'mailto:' + currentLead.email;
+}
+
+function closePanel(e){
+  if (e && e.target !== e.currentTarget) return;
+  flushPanel();   // klik mimo panel / ✕ nikdy neztratí zadané změny
+  document.getElementById('panelOverlay').classList.remove('open');
+  document.getElementById('leadPanel').classList.remove('open');
+  currentLead = null;
+}
+
+function openNewLead(){
+  const email = prompt('E-mail nového leadu:');
+  if (!email) return;
+  const jmeno = prompt('Jméno:') || '';
+  const firma = prompt('Firma:') || '';
+  const telefon = prompt('Telefon:') || '';
+  createLead({email, jmeno, firma, telefon});
+}
+
+async function createLead(l){
+  showSync('💾 Vytvářím…', '#d97706');
+  try{
+    const body = {
+      email: l.email, jmeno: l.jmeno||'', firma: l.firma||'',
+      telefon: l.telefon||'', datum: new Date().toISOString().slice(0,10),
+      zdroj: l.zdroj || 'ruční přidání', sluzba: l.sluzba||'', problem: l.problem||''
+    };
+    const r = await fetch(SB+'/rest/v1/leads', {
+      method:'POST', headers:{...H,'Prefer':'return=representation'}, body: JSON.stringify(body)
+    });
+    if (!r.ok) throw new Error(await r.text());
+    showSync('✅ Přidáno', '#16a34a');
+    await loadAll();
+  }catch(e){ showSync('⚠️ '+e.message, '#ef4444'); }
+}
+
+// Uloží změny z panelu (jen pokud se něco změnilo). Volá se při změně pole, zavření panelu i tlačítku.
+// oldNotes se zachytává PŘED mutací (kritická oprava - diff poznámek do activity_log)
+const PANEL_KEYS = ['stav','followup','myNotes','prodej_castka','prodej_produkt','prodej_note','campaign_name'];
+function panelValues(){
+  return {
+    stav:           document.getElementById('pStage').value,
+    followup:       document.getElementById('pFollowup').value,
+    myNotes:        document.getElementById('pNotes').value,
+    prodej_castka:  document.getElementById('pCastka').value,
+    prodej_produkt: document.getElementById('pProdukt').value,
+    prodej_note:    document.getElementById('pProdejNote').value,
+    campaign_name:  document.getElementById('pKampan').value,
+  };
+}
+function flushPanel() {
+  if (!currentLead) return;
+  const v = panelValues();
+  const changedKeys = PANEL_KEYS.filter(k => String(currentLead[k] ?? '') !== String(v[k] ?? ''));
+  if (!changedKeys.length) return;
+
+  const oldStav  = currentLead.stav;
+  const oldNotes = currentLead.myNotes || ''; // ← MUSÍ BÝT PŘED přepsáním!
+  const oldCampaign = currentLead.campaign_name || '';
+  PANEL_KEYS.forEach(k => currentLead[k] = v[k]);
+  currentLead.poz = getPoz(currentLead.stav); // poz se odvozuje ze stav
+
+  const crmKeys = changedKeys.filter(k => k !== 'campaign_name');
+  if (crmKeys.length) saveToApi(currentLead, oldStav, oldNotes, crmKeys);
+  if (currentLead.campaign_name !== oldCampaign) updateLeadCampaign(currentLead.email, currentLead.campaign_name);
+  render();
+}
+function savePanel() { flushPanel(); closePanel(); }
+
+// campaign_name žije v tabulce leads, ne crm_data — samostatný PATCH
+async function updateLeadCampaign(email, campaign_name){
+  try{
+    await fetch(SB+'/rest/v1/leads?email=eq.'+encodeURIComponent(email), {
+      method:'PATCH', headers:{...H,'Prefer':'return=minimal'},
+      body: JSON.stringify({campaign_name})
+    });
+  }catch(e){ /* tiché */ }
+}
+
+// ============================================================
+// ZÁLOŽKA: STATISTIKY
+// ============================================================
+function renderStats(){
+  const total = leads.length;
+  const uz = leads.filter(l => getPoz(l.stav)==='uzavreno');
+  const revenue = leads.reduce((s,l) => s + (Number(l.prodej_castka)||0), 0);
+  const convRate = total ? (uz.length/total*100).toFixed(1) : '0.0';
+
+  const phaseCounts = FAZE.filter(f=>f.id).map(f => ({
+    f, count: leads.filter(l => l.stav === f.id).length
+  })).sort((a,b)=>b.count-a.count);
+  const maxCount = Math.max(1, ...phaseCounts.map(p=>p.count));
+
+  document.getElementById('view-stats').innerHTML = `
+    <div class="stats-grid">
+      <div class="big-stat"><div class="n">${total}</div><div class="l">Celkem leadů</div></div>
+      <div class="big-stat"><div class="n" style="color:var(--green)">${uz.length}</div><div class="l">Uzavřených obchodů</div></div>
+      <div class="big-stat"><div class="n" style="color:var(--accent2)">${convRate}%</div><div class="l">Konverze (uzavřeno/celkem)</div></div>
+      <div class="big-stat"><div class="n" style="color:var(--yellow)">${revenue.toLocaleString('cs-CZ')} €</div><div class="l">Celkový obrat</div></div>
+    </div>
+    <div class="section-title">Rozložení podle fáze</div>
+    <div class="table-wrap" style="padding:16px 18px;">
+      ${phaseCounts.map(p => `
+        <div class="phase-row">
+          <div class="plabel">${p.f.label}</div>
+          <div class="pbar-wrap"><div class="pbar" style="width:${(p.count/maxCount*100)}%;background:${p.f.color}"></div></div>
+          <div class="pcount">${p.count}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ============================================================
+// ZÁLOŽKA: KAMPANĚ
+// ============================================================
+function renderKampane(){
+  const groups = {};
+  leads.forEach(l => {
+    const key = l.campaign_name || l.ad_name || 'Neuvedeno';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(l);
+  });
+
+  const rows = Object.keys(groups).map(name => {
+    const list = groups[name];
+    const leadCount = list.length;
+    const sales = list.filter(l => Number(l.prodej_castka) > 0);
+    const revenue = list.reduce((s,l)=>s+(Number(l.prodej_castka)||0),0);
+    const conv = leadCount ? (sales.length/leadCount*100).toFixed(1) : '0.0';
+    const spend = fbSpend[name] || 0;
+    const cpl = (spend && leadCount) ? (spend/leadCount) : 0;
+    const roas = (spend > 0) ? (revenue/spend) : 0;
+    return {name, leadCount, salesCount: sales.length, conv, revenue, spend, cpl, roas};
+  }).sort((a,b) => b.leadCount - a.leadCount);
+
+  if (!rows.length){
+    document.getElementById('view-kampane').innerHTML = `<div class="empty-state">Zatím žádné kampaně / kreativy k zobrazení.</div>`;
+    return;
+  }
+
+  document.getElementById('view-kampane').innerHTML = `
+    <div class="camp-table-wrap">
+      <table class="camp-table">
+        <thead><tr>
+          <th>Kreativa / kampaň</th><th>Leady</th><th>Prodeje</th><th>Konverze</th>
+          <th>Obrat</th><th>FB Spend</th><th>CPL</th><th>ROAS</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td>${esc(r.name)}</td>
+              <td>${r.leadCount}</td>
+              <td>${r.salesCount}</td>
+              <td>${r.conv}%</td>
+              <td>${r.revenue.toLocaleString('cs-CZ')} €</td>
+              <td>${r.spend ? r.spend.toLocaleString('cs-CZ')+' Kč' : '<span class="muted">–</span>'}</td>
+              <td>${r.cpl ? r.cpl.toFixed(0)+' Kč' : '<span class="muted">–</span>'}</td>
+              <td class="${r.roas>=3?'roas-good':(r.roas>0?'roas-bad':'')}">${r.roas ? r.roas.toFixed(2)+'x' : '<span class="muted">–</span>'}</td>
+              <td><button class="btn btn-sm" onclick="editFbSpend('${escAttr(r.name)}')">✏️</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+async function editFbSpend(campName){
+  const cur = fbSpend[campName] || 0;
+  const val = prompt('FB výdaje pro:\n' + campName, cur);
+  if (val === null) return;
+  const spend = Number(val.replace(',', '.')) || 0;
+  try{
+    const r = await fetch(SB+'/rest/v1/fb_spend', {
+      method: 'POST',
+      headers: {...H, 'Prefer': 'resolution=merge-duplicates,return=minimal'},
+      body: JSON.stringify({campaign_name: campName, spend})
+    });
+    if (!r.ok) throw new Error(await r.text());
+    fbSpend[campName] = spend;
+    showToast('FB výdaje uloženy');
+    renderKampane();
+  }catch(e){ showToast('Chyba ukládání: '+e.message); }
+}
+
+// ============================================================
+// ZÁLOŽKA: DENNÍ
+// ============================================================
+function last7Days(){
+  const arr = [];
+  for (let i=6; i>=0; i--){
+    const d = new Date();
+    d.setDate(d.getDate()-i);
+    arr.push(d.toISOString().slice(0,10));
+  }
+  return arr;
+}
+
+async function loadDenniCounts(){
+  denniCounts = {};
+  const days = last7Days();
+  try{
+    const from = days[0];
+    const r = await fetch(SB+'/rest/v1/activity_log?select=date&date=gte.'+from, {headers:H});
+    if (r.ok){
+      const rows = await r.json();
+      rows.forEach(row => {
+        const d = (row.date || '').slice(0,10);
+        denniCounts[d] = (denniCounts[d]||0) + 1;
+      });
+    }
+  }catch(e){ /* tiché */ }
+  if (currentTab === 'denni') renderDenni();
+}
+
+function renderDenni(){
+  const days = last7Days();
+  if (!denniDay) denniDay = days[days.length-1];
+
+  const nav = days.map(d => {
+    const dt = new Date(d+'T12:00:00');
+    const wd = WD[dt.getDay()];
+    const dd = dt.getDate();
+    const count = denniCounts[d] || 0;
+    return `<button class="day-btn ${d===denniDay?'active':''}" data-day="${d}" onclick="switchDenniDay('${d}')">
+      <div class="wd">${wd}</div><div class="dd">${dd}</div>
+      ${count>0 ? '<div class="dot"></div>' : ''}
+    </button>`;
+  }).join('');
+
+  document.getElementById('view-denni').innerHTML = `
+    <div class="denni-nav" id="denni-nav">${nav}</div>
+    <div id="denni-content"><div class="muted" style="padding:20px 0;">Načítám…</div></div>
+  `;
+  switchDenniDay(denniDay);
+}
+
+// Přepne den — aktualizuje třídu active na tlačítkách BEZ přestavění celého nav HTML
+async function switchDenniDay(day){
+  document.querySelectorAll('#denni-nav .day-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.day === day);
+  });
+  denniDay = day;
+  denniLoading = true;
+  const content = document.getElementById('denni-content');
+  content.innerHTML = `<div class="muted" style="padding:20px 0;">Načítám…</div>`;
+  try{
+    const r = await fetch(SB+'/rest/v1/activity_log?select=*&date=eq.'+day+'&order=created_at.desc', {headers:H});
+    const rows = r.ok ? await r.json() : [];
+    denniBuf = rows;
+    renderDenniContent(rows);
+  }catch(e){
+    content.innerHTML = `<div class="empty-state">Chyba načítání aktivit.</div>`;
+  }
+  denniLoading = false;
+}
+
+// Renderuje obsah dne
+function renderDenniContent(rows){
+  const content = document.getElementById('denni-content');
+  if (!rows.length){
+    content.innerHTML = `<div class="empty-state">Tento den nemá zaznamenanou žádnou aktivitu.</div>`;
+    return;
+  }
+  content.innerHTML = rows.map(row => {
+    const time = row.created_at ? new Date(row.created_at).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'}) : '';
+    if (row.action === 'stav_zmena'){
+      const oldF = getFaze(row.old_stav);
+      const newF = getFaze(row.new_stav);
+      let lastNote = '';
+      if (row.note){
+        lastNote = row.note.includes(',') ? row.note.split(',').pop().trim() : row.note;
+      }
+      return `<div class="denni-item">
+        <div class="who">${esc(row.lead_name)||esc(row.lead_email)} <span class="muted" style="font-weight:400;">${time}</span></div>
+        <div class="fi">${esc(row.lead_firma)||''}</div>
+        <div class="chg">
+          <span class="badge" style="background:${oldF.color}22;color:${oldF.color}">${oldF.label||'—'}</span>
+          <span class="arrow">→</span>
+          <span class="badge" style="background:${newF.color}22;color:${newF.color}">${newF.label||'—'}</span>
+        </div>
+        ${lastNote ? `<div class="note">💬 ${esc(lastNote)}</div>` : ''}
+      </div>`;
+    } else {
+      return `<div class="denni-item">
+        <div class="who">${esc(row.lead_name)||esc(row.lead_email)} <span class="muted" style="font-weight:400;">${time}</span></div>
+        <div class="fi">${esc(row.lead_firma)||''}</div>
+        <div class="note">📝 ${esc(row.note)}</div>
+      </div>`;
+    }
+  }).join('');
+}
+
+// ============================================================
+// IMPORT Z GOOGLE SHEETS
+// ============================================================
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i=0; i<text.length; i++){
+    const c = text[i], next = text[i+1];
+    if (inQuotes){
+      if (c === '"' && next === '"'){ field += '"'; i++; }
+      else if (c === '"'){ inQuotes = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ','){ row.push(field); field=''; }
+      else if (c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if (c === '\r'){ /* skip */ }
+      else field += c;
+    }
+  }
+  if (field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.length && r.some(x=>x.trim()!==''));
+}
+
+function normalizeHeader(h){
+  return h.trim().toLowerCase()
+    .replace(/á/g,'a').replace(/č/g,'c').replace(/ď/g,'d').replace(/é/g,'e')
+    .replace(/ě/g,'e').replace(/í/g,'i').replace(/ň/g,'n').replace(/ó/g,'o')
+    .replace(/ř/g,'r').replace(/š/g,'s').replace(/ť/g,'t').replace(/ú/g,'u')
+    .replace(/ů/g,'u').replace(/ý/g,'y').replace(/ž/g,'z');
+}
+
+// Mapování sloupců Meta Lead Ads formuláře -> pole v CRM
+function mapHeader(h){
+  const n = normalizeHeader(h).replace(/\s+/g,'_');
+  if (n === 'e-mail' || n === 'email') return 'email';
+  if (n === 'cele_jmeno' || n === 'jmeno' || n === 'full_name') return 'jmeno';
+  if (n === 'phone_number' || n === 'telefon' || n === 'phone') return 'telefon';
+  if (n === 'created_time') return 'datum';
+  if (n === 'campaign_name') return 'campaign_name';
+  if (n === 'ad_name') return 'ad_name';
+  if (n === 'platform') return 'platform';
+  if (n === 'form_name') return 'form_name';
+  if (n.startsWith('jak_vas_mame')) return 'kontakt';   // Jak vás máme nejlépe kontaktovat?
+  if (n.startsWith('kdy_byste')) return 'zacit';       // Kdy byste chtěl/a začít?
+  if (n.startsWith('mam_zajem')) return 'zajem';       // Mám zájem o:
+  return n;
+}
+
+function cleanChoice(v){
+  let t = (v||'').replace(/_/g,' ').trim();
+  if (!t) return '';
+  const low = t.toLowerCase();
+  if (low === 'whatsapp') return 'WhatsApp';
+  if (low === 'sms') return 'SMS';
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+const INTEREST_NAMES = {'kosmetickou péči':'Kosmetická péče', 'maderoterapii':'Maderoterapie'};
+function cleanInterest(v){
+  const t = cleanChoice(v);
+  return INTEREST_NAMES[t.toLowerCase()] || t;
+}
+function cleanPhone(v){ return (v||'').replace(/^p:/i,'').trim(); }
+function toPragueDate(v){
+  const d = new Date(v);
+  if (isNaN(d)) return new Date().toISOString().slice(0,10);
+  return d.toLocaleDateString('sv-SE', {timeZone:'Europe/Prague'}); // YYYY-MM-DD
+}
+
+async function fetchTab(tab){
+  const res = await fetch(gsheetUrl(tab.gid));
+  if (!res.ok) throw new Error(tab.name + ': nelze stáhnout (' + res.status + ')');
+  const rows = parseCSV(await res.text());
+  if (!rows.length) return [];
+  const headers = rows[0].map(mapHeader);
+  if (!headers.includes('email')) throw new Error(tab.name + ': chybí sloupec e-mail');
+  return rows.slice(1).map(r => {
+    const obj = {_tab: tab.name};
+    headers.forEach((h,i) => obj[h] = (r[i]||'').trim());
+    return obj;
+  });
+}
+
+async function syncFromSheet(silent){
+  if (silent !== true) showSync('⏳ Stahuji ze Sheetu…', '#d97706');
+  try{
+    lastSheetSync = Date.now();
+    // všechny listy se stahují zároveň; chyba jednoho listu neshodí ostatní
+    const settled = await Promise.allSettled(GSHEET_TABS.map(fetchTab));
+    const problems = settled.filter(x => x.status === 'rejected').map(x => x.reason.message);
+    if (problems.length === GSHEET_TABS.length) throw new Error(problems[0]);
+    const all = settled.filter(x => x.status === 'fulfilled').flatMap(x => x.value);
+
+    // nejstarší první -> při stejném e-mailu na více listech vyhraje nejnovější záznam
+    all.sort((a,b) => (Date.parse(a.datum)||0) - (Date.parse(b.datum)||0));
+
+    const known = new Set(leads.map(l => l.email));
+    const batch = new Map();   // email -> body (duplicity se sloučí)
+    let skipped = 0;
+    for (const obj of all){
+      const email = (obj.email||'').toLowerCase();
+      if (!email){ skipped++; continue; }
+      const body = {
+        email,
+        jmeno: obj.jmeno || '',
+        telefon: cleanPhone(obj.telefon),
+        datum: toPragueDate(obj.datum),
+        zdroj: obj.form_name || 'Meta formulář',
+        sluzba: cleanChoice(obj.kontakt),     // sloupec "Jak kontaktovat"
+        problem: cleanChoice(obj.zacit),      // sloupec "Kdy začít"
+        campaign_name: obj.campaign_name || '',
+        ad_name: obj.ad_name || '',
+        platform: (obj.platform || '').toUpperCase()
+      };
+      const z = cleanInterest(obj.zajem);     // sloupec "Zájem o" (jen novější formulář)
+      if (z) body.zajem_o = z;
+      batch.set(email, body);
+    }
+    const bodies = [...batch.values()];
+    // Nové leady: všechna pole ze Sheetu. Existující: bez kampaně/reklamy/platformy,
+    // ať import nepřepíše ručně zadanou kampaň (změněné jméno/telefon/odpovědi se aktualizují).
+    const newOnes = bodies.filter(b => !known.has(b.email));
+    const oldOnes = bodies.filter(b => known.has(b.email)).map(({campaign_name, ad_name, platform, ...rest}) => rest);
+    const inserted = newOnes.length, updated = oldOnes.length;
+
+    // Dávky se stejnou sadou polí posíláme zvlášť, aby chybějící pole nepřepsalo hodnotu prázdnem
+    const groups = new Map();
+    [...newOnes, ...oldOnes].forEach(b => {
+      const key = Object.keys(b).sort().join(',');
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(b);
+    });
+    const post = part => fetch(SB+'/rest/v1/leads?on_conflict=email', {
+      method:'POST',
+      headers:{...H,'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body: JSON.stringify(part)
+    });
+    let missingZajem = false;
+    for (const part of groups.values()){
+      let r2 = await post(part);
+      if (!r2.ok){
+        const txt = await r2.text();
+        // v databázi ještě chybí sloupec "zajem" -> import nesmí spadnout, uloží se bez něj
+        if (/zajem/.test(txt) && part.some(b => 'zajem_o' in b)){
+          missingZajem = true;
+          r2 = await post(part.map(({zajem_o, ...rest}) => rest));
+          if (!r2.ok) throw new Error(await r2.text());
+        } else throw new Error(txt);
+      }
+    }
+    const warn = [];
+    if (problems.length) warn.push('Pozor: ' + problems.join('; '));
+    if (missingZajem) warn.push('V databázi chybí sloupec „zajem_o“ – leady jsou bez „Zájem o“. Spusť v Supabase: ALTER TABLE leads ADD COLUMN IF NOT EXISTS zajem_o TEXT;');
+    if (warn.length){
+      showSync(missingZajem ? '⚠️ Chybí sloupec v databázi' : '⚠️ Část listů selhala', '#d97706');
+      showToast(warn.join('  '));
+    } else {
+      showSync('✅ Synchronizováno', '#16a34a');
+    }
+    if (silent !== true || inserted > 0) showToast(`Leady: ${inserted} nových, ${updated} aktualizováno${skipped?`, ${skipped} bez e-mailu přeskočeno`:''}`);
+    await loadAll(true);
+    if (warn.length) showSync(missingZajem ? '⚠️ Chybí sloupec v databázi' : '⚠️ Část listů selhala', '#d97706');
+  }catch(e){
+    showSync('⚠️ Chyba importu', '#ef4444');
+    showToast('Chyba importu: ' + e.message);
+  }
+}
+
+// ============================================================
+// PŘIHLÁŠENÍ (jednoduchá klientská ochrana)
+// ============================================================
+const AUTH_USER = 'Eva1';
+const AUTH_PASS = 'PureTouch1?';
+
+function attemptLogin(e){
+  if (e) e.preventDefault();
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if (u === AUTH_USER && p === AUTH_PASS){
+    localStorage.setItem('pt_auth', 'ok');
+    document.getElementById('loginOverlay').style.display = 'none';
+    startApp();
+  } else {
+    document.getElementById('loginError').textContent = 'Nesprávné jméno nebo heslo.';
+  }
+  return false;
+}
+
+// ============================================================
+// SYNCHRONIZACE MEZI ZAŘÍZENÍMI (PC ↔ telefon)
+// Data jsou v jedné databázi; otevřená stránka se sama obnovuje
+// ============================================================
+let lastInteraction = 0, lastSheetSync = 0, refreshBusy = false, syncLoopStarted = false;
+async function silentRefresh(){
+  if (refreshBusy || pendingSaves > 0 || document.hidden) return;
+  if (document.getElementById('leadPanel').classList.contains('open')) return;   // právě upravuješ detail
+  if (Date.now() - lastInteraction < (window.__IDLE_MS || 12000)) return;                              // právě něco děláš
+  refreshBusy = true;
+  try { await loadAll(true); } finally { refreshBusy = false; }
+}
+function onReturnToApp(){
+  silentRefresh().then(() => { if (Date.now() - lastSheetSync > 180000) syncFromSheet(true); });
+}
+function startSyncLoop(){
+  if (syncLoopStarted) return;
+  syncLoopStarted = true;
+  ['pointerdown','keydown','change','input'].forEach(ev => document.addEventListener(ev, () => { lastInteraction = Date.now(); }, true));
+  setInterval(silentRefresh, window.__SYNC_MS || 30000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) onReturnToApp(); });
+  window.addEventListener('focus', onReturnToApp);
+}
+
+function startApp(){
+  setTab('table');
+  // při otevření CRM se nejdřív načte databáze a pak se automaticky doplní nové leady ze Sheetu
+  startSyncLoop();
+  loadAll().then(() => syncFromSheet(true));
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('resize', () => { if (localStorage.getItem('pt_auth') === 'ok') setTab(currentTab); });   // přepne tabulku ↔ karty při změně šířky
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('leadPanel').addEventListener('change', flushPanel);   // ukládání hned po změně pole
+  if (localStorage.getItem('pt_auth') === 'ok'){
+    document.getElementById('loginOverlay').style.display = 'none';
+    startApp();
+  }
+  // jinak zůstává viditelný přihlašovací overlay a CRM se nenačítá
+});
+</script>
+</body>
+</html>
